@@ -1,0 +1,40 @@
+#this is a cypher for shortest path between two nodes
+0. make schema command
+1. create index CREATE INDEX ON :Person(name)
+2. (L4) -- (Neo4j Case Studies: Accenture)
+
+3.
+
+MATCH (h1:Host {ip:src_ip}), 
+      (h2:Host {ip:dst_ip})
+MATCH p=shortestPath((h1)-[*]->(s:Switch)<-[*]-(h2))
+RETURN [ n in nodes(p)[1..-1] | n.dip ];
+
+
+CREATE (h1:Host {name: "A"})
+CREATE (h2:Host {name: "B"})
+Create (h3:Host {name: "c"})
+Create (swa:switch {did: "aa"})
+Create (swb:switch {did: "bb"})
+
+MATCH (h1:Host {name: "A"}), (h2:Host {name: "B"}),
+      (swa:switch {did: "aa"})      
+CREATE (h1)-[:connected_to {port1:"h1port1"}]->(swa)
+create (h2)-[:connected_to {port1:"h2port1"}]->(swa);
+
+MATCH (swa:switch {did: "aa"}), 
+      (swb:switch {did: "bb"})      
+Merge (swa)<-[:switch_to {part1:swa.did}]-(swb);
+
+
+MATCH (h1:Host {name:"A"})-->(sw1:switch), 
+      (h2:Host {name:"B"})-->(sw2:switch)
+ p=shortestPath((sw1)-[*]->(sw2))
+RETURN p;
+
+MATCH (h1:Host {ip:"10.5.5.4"})-[:Connected_to]->(sw1:Switch),
+ (h2:Host {ip:"10.14.5.3"})-[:Connected_to]->(sw2:Switch)
+Match p=shortestPath((sw1)-[*..15]->(sw2))
+RETURN nodes(p);
+
+extract(n in nodes(path) | n.name)
