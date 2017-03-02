@@ -10,6 +10,13 @@ def blockHost(session,hostIP):
 		msgOF("blockHost",hostIP,hostblocked['s2.dpid'])
 		return
 	return False
+	
+def blockHost_easy(session,hostIP):
+	result = session.run('''Match (h1:Host{ip:{firstip}})  REMOVE h1:Host SET h1:blockedHost return h1''',{"firstip": hostIP} )
+	for hostblocked in result:
+		#msgOF("blockHost",hostIP,hostblocked['s2.dpid'])
+		return
+	return False
 	#print "Blocking Host with IP %s was NOT successful! Are you sure it exists?!"%hostIP
 	
 
@@ -19,7 +26,7 @@ def blockPath(session, srcIP,dstIP):
 	result = session.run('''MATCH (h1:Host{ip:{firstip}}) -[r:Path_to]-(h2:Host{ip:{secondip}}) CREATE (h1)-[r2:Blockedpath_to]->(h2) SET r2 = r WITH r, r2  DELETE r return r2.switches; ''',{"firstip": srcIP, "secondip": dstIP} )
 	for sw in result:
 		if sw["r2.switches"] is not None:
-			print "Blocking Path from %s to %s was successful"%(srcIP,dstIP)
+			#print "Blocking Path from %s to %s was successful"%(srcIP,dstIP)
 			#print sw["switch"] # get switch DPID
 			msgOF("blockPath",srcIP,dstIP)
 			return
@@ -34,6 +41,15 @@ def unblockHost(session, hostIP):
 	result = session.run('''Match (h1:blockedHost{ip:{firstip}}) -[r:Connected_to]->(s2:Switch) REMOVE h1:blockedHost SET h1:Host return  distinct s2.dpid;''',{"firstip": hostIP} )
 	for hostblocked in result:
 		msgOF("unblockHost",hostblocked['s2.dpid'])
+		return
+	return False
+	
+
+def unblockHost_easy(session, hostIP):
+	
+	result = session.run('''Match (h1:blockedHost{ip:{firstip}}) REMOVE h1:blockedHost SET h1:Host return  h1;''',{"firstip": hostIP} )
+	for hostblocked in result:
+		#msgOF("unblockHost",hostblocked['s2.dpid'])
 		return
 	return False
 	#print "Unblocking Host with IP %s was NOT successful! Are you sure it exists or already not blocked?!"%hostIP

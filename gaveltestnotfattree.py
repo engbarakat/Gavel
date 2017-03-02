@@ -47,7 +47,10 @@ def runthetest(sizeoffattree,itera,listofpath):
 		bstartt = timeit.default_timer() *1000
 		for path in result:
 			#print path['switch'], path['port']
-			result = session.run('''Create (p1:Path{from:{firstip}, to:{secondip}, switches:{nodelist}, ports:{relslist}});''',{"firstip": key, "secondip": v, "nodelist":path['switch'],"relslist":path["port"]} )
+			#'''MATCH (h1:Host {ip:{firstip}}), (h2:Host {ip:{secondip}}) Match p=shortestPath((h1)-[:Connected_to*]->(h2)) with h1,h2, p
+	#create (h1)-[pa:Path_to{switches:[n in nodes(p)[1..-1]| n.dpid], ports:[r in rels(p)[1..]| r.port1]}]->(h2) return pa.switches, pa.ports;'''
+			result = session.run('''MATCH (h1:Host {ip:{firstip}}), (h2:Host {ip:{secondip}}) create (h1)-[pa:Path_to{switches:{nodelist}, ports:{relslist}}]->(h2)
+			;''',{"firstip": key, "secondip": v, "nodelist":path['switch'],"relslist":path["port"]} )
 		bendt = timeit.default_timer() *1000
 		path = Path(key,v,aendt-astartt,bendt-bstartt)
 		listofpath.append(path)
