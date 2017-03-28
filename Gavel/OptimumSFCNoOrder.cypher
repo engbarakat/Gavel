@@ -14,3 +14,7 @@ reduce(dist = 0, rel in rels(path)[0..kidPositions[i]] | dist + rel.distance) < 
 RETURN path, pathLength
 ORDER BY pathLength ASC
 LIMIT 1
+
+#1 replace all variables with the correct ones
+#2. delete unwanted lines
+#3. add any specific lines
