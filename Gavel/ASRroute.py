@@ -49,6 +49,10 @@ def getsubroute(session, src,srctype, dst,dsttype):
 	
 
 def asrroutecalculation(session, srcIP,dstIP,listofFun):
+	#Change to New Scheme
+'''Change to New scheme: iterate functionID list, Get switches connected to each function, Find shortest path for each switch and select the shortest among them. Finally append it to the full path
+
+		What you need here is only change the way you get switches list''' 
 	#iterate the list of functions --DONE
 	#find the shortest path from src to fn1 --DONE
 	#return path and cost --DONE

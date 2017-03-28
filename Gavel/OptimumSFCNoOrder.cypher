@@ -29,4 +29,10 @@ numberOfKids
     c. all functions need to be associated with some nodes(relationships) //size(filter(x in nodes(path) WHERE (x:Kid))) >= numberOfKids
     d. every path matches above are saved to validpaths list
    
-3.
+3.Exempt all path that appears to go through functions more than once.
+
+4. Exempt paths that Functions appear in different order (OPT)
+
+5. exempt all paths that doesnt go through all required functions. review line No. 8
+
+6. Later could be extented to implement BW constrains or delay constrains (OPT)
