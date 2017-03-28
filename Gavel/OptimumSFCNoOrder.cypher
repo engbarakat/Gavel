@@ -26,5 +26,7 @@ numberOfKids
 2. You are looking for a subgraph contains:
     a. start node is Hostsrc
     b. end node is Hostend
-    c. all functions need to be associated with some nodes(relationships)
+    c. all functions need to be associated with some nodes(relationships) //size(filter(x in nodes(path) WHERE (x:Kid))) >= numberOfKids
+    d. every path matches above are saved to validpaths list
+    
 3. 
