@@ -18,3 +18,13 @@ LIMIT 1
 #1 replace all variables with the correct ones
 #2. delete unwanted lines
 #3. add any specific lines
+
+Kid
+kid
+numberOfKids
+1. Match and get Functions
+2. You are looking for a subgraph contains:
+    a. start node is Hostsrc
+    b. end node is Hostend
+    c. all functions need to be associated with some nodes(relationships)
+3. 
