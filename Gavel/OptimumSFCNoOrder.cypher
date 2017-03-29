@@ -36,3 +36,8 @@ numberOfKids
 5. exempt all paths that doesnt go through all required functions. review line No. 8
 
 6. Later could be extented to implement BW constrains or delay constrains (OPT)
+
+Match (function:MB) where MB.dpid in {values} return MBsSet
+Match path = (startnode)->(endnode) return path as pathsetraw
+with pathsetraw, MBsSet
+-- for every switch in the path get all functions connected to it, return distinct set of all functions supported by the path. (write function that take path and return supported functions)
