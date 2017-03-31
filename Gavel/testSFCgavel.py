@@ -19,6 +19,9 @@ class Path:
 def loadftgdb(sizeoffattree):
 	print ">>>>>>>neo4j-shell -file new_gdb%s.cypher -host localhost -v" %sizeoffattree
 	os.system("neo4j-shell -file new_gdb%s.cypher -host localhost -v" %sizeoffattree)
+	
+def installMBs(session, Switches, numberofMBs):
+	#get random number of random switches to host each MB
 
 def runthetest(sizeoffattree,itera,listofpath):
 	print ">>>>>>>start the test with size of %s for the time No.%d" %(sizeoffattree,itera)

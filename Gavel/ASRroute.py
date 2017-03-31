@@ -7,6 +7,13 @@ class NetworkFunction():
 	def __init__(self,nfid,listofhostednodes):
 		self.listofhostednodes = listofhostednodes
 		self.nfid = nfid
+	
+	def __init__(self, nfid):
+		self.nfid = nfid;
+	
+	def setlistofhostednodes(self, listofMBs):
+		self.listofhostednodes.extend(listofMBs)
+		
 	def __str__(self):
 		return str(self.listofhostednodes)
 
@@ -47,12 +54,15 @@ def getsubroute(session, src,srctype, dst,dsttype):
 		for pathins in result:
 			return Subpath(pathins["switches"],pathins["ports"],pathins["cost"],pathins["node"])
 	
+def getallhostingSwitches(session,listofFun):
+	for fn in listofFun:
+		result =  session.run('''Match (s1:Switch)-[hosting_MB]-(mb:MiddleBox{dpid:{fnID}}) return s1 as hosting ''',{"fnID",fn})
+		for switches in result:
+			fn.setlistofhostednodes(switches["hosting"])
+	
 
 def asrroutecalculation(session, srcIP,dstIP,listofFun):
 	#Change to New Scheme
-'''Change to New scheme: iterate functionID list, Get switches connected to each function, Find shortest path for each switch and select the shortest among them. Finally append it to the full path
-
-		What you need here is only change the way you get switches list''' 
 	#iterate the list of functions --DONE
 	#find the shortest path from src to fn1 --DONE
 	#return path and cost --DONE

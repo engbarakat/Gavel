@@ -41,3 +41,13 @@ Match (function:MB) where MB.dpid in {values} return MBsSet
 Match path = (startnode)->(endnode) return path as pathsetraw
 with pathsetraw, MBsSet
 -- for every switch in the path get all functions connected to it, return distinct set of all functions supported by the path. (write function that take path and return supported functions)
+
+
+************************New algorithm
+
+Build the routing solution
+
+for every Function in the list:
+
+1. find the shortest path for every node hosts this function
+2. build a decision tree then find the route to the end. 
