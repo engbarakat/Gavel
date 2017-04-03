@@ -8,8 +8,8 @@ class NetworkFunction():
 		self.listofhostednodes = listofhostednodes
 		self.nfid = nfid
 	
-	def __init__(self, nfid):
-		self.nfid = nfid;
+	#def __init__(self, nfid):
+		#self.nfid = nfid;
 	
 	def setlistofhostednodes(self, listofMBs):
 		self.listofhostednodes.extend(listofMBs)
@@ -30,6 +30,9 @@ class Subpath():
 
 def getsubroute(session, src,srctype, dst,dsttype):
 	#print"getting shortest path between " + src +" and "+  dst
+	To Do : check if src and dst are the same thing then return only hte cost of processing.
+	implement cost of processing also.
+	
 	if (srctype == 0):
 		#print"getting shortest path between " + src +" and "+  dst
 		#src is host

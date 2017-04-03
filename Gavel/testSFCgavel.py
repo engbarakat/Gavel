@@ -1,7 +1,7 @@
 from neo4j.v1 import GraphDatabase, basic_auth
 from firewall import *
 from route import *
-from loadbalancer import *
+#from loadbalancer import *
 from ASRroute import *
 import timeit
 import random
@@ -27,13 +27,13 @@ def installMBs(session, Switches, numberofMBs):
 	#3. associate the MB with the choosen switch.
 	listofMBs = []
 	for x in range(numberofMBs):
-		session.run('''CREATE (:MiddelBox {id: MBid, dpid: MBdpid });''',{"MBid":str(x),"MBdpid":"mb30"+str(x)})
-		NoofHosts =randint(2,3)
+		session.run('''CREATE (:MiddelBox {id: {MBid}, dpid: {MBdpid} });''',{"MBid":str(x),"MBdpid":"mb30"+str(x)})
+		NoofHosts =random.randint(2,3)
+		#print NoofHosts
 		switchlist =  random.sample(Switches,NoofHosts)
-		session.run('''CREATE (m:MiddelBox {id: MBid, dpid: MBdpid });
-					   Match (s:Switch) where s.dpid in {slist};
-		MERGE (m)-[r:Hosts]-(s) ON CREATE SET r.cost= scostmb;''',{"MBid":str(x),"MBdpid":"mb30"+str(x),"slist":switchlist,"scostmb":randint(2,9)})
-		listofMBs.append("mb30"+str(x))
+		session.run('''Match (m:MiddleBox{dpid: {MBdpid}}) Match (s:Switch) where s.dpid in {slist} 
+		MERGE (m)-[r:Hosts]-(s) ON CREATE SET r.cost= {scostmb};''',{"MBdpid":"mb30"+str(x),"slist":switchlist,"scostmb":random.randint(2,9)})
+		listofMBs.append(NetworkFunction("mb30"+str(x),switchlist))
 	return listofMBs
 
 def runthetest(sizeoffattree,itera,listofpath):
@@ -49,13 +49,17 @@ def runthetest(sizeoffattree,itera,listofpath):
 	listoftimeb = []
 	result = session.run('''Match (h:Switch) return h.dpid AS dpid ''')
 	resultlistnotrandom = list(result)
+	switchlist = []
+	for s in resultlistnotrandom:
+		switchlist.append(s["dpid"])
+	#print switchlist
 	'''resultlist = random.sample(resultlistnotrandom,9)
 	NFone = NetworkFunction(100,[resultlist[0]["dpid"],resultlist[4]["dpid"],resultlist[3]["dpid"]])
 	NFtwo = NetworkFunction(200,[resultlist[7]["dpid"],resultlist[2]["dpid"],resultlist[1]["dpid"]])
 	NFthree = NetworkFunction(300,[resultlist[8]["dpid"],resultlist[6]["dpid"],resultlist[5]["dpid"]])'''
 	numberofMBs = 4
-	listofSFC = installMBs(session, resultlistnotrandom, numberofMBs)
-	
+	listofSFC = installMBs(session, switchlist, numberofMBs)
+	print listofSFC
 	result = session.run('''Match (h:Host) return h.ip AS ip ''')
 	resultlistnotrandom = list(result)
 	resultlist = random.sample(resultlistnotrandom,20)
