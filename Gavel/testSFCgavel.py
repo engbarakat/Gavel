@@ -22,10 +22,23 @@ def loadftgdb(sizeoffattree):
 	
 def installMBs(session, Switches, numberofMBs):
 	#get random number of random switches to host each MB
+	#1. create MBs and return their dpid in list--create node
+	#2. for every MB select random no. of host and then select radnomly the same number of swich
+	#3. associate the MB with the choosen switch.
+	listofMBs = []
+	for x in range(numberofMBs):
+		session.run('''CREATE (:MiddelBox {id: MBid, dpid: MBdpid });''',{"MBid":str(x),"MBdpid":"mb30"+str(x)})
+		NoofHosts =randint(2,3)
+		switchlist =  random.sample(Switches,NoofHosts)
+		session.run('''CREATE (m:MiddelBox {id: MBid, dpid: MBdpid });
+					   Match (s:Switch) where s.dpid in {slist};
+		MERGE (m)-[r:Hosts]-(s) ON CREATE SET r.cost= scostmb;''',{"MBid":str(x),"MBdpid":"mb30"+str(x),"slist":switchlist,"scostmb":randint(2,9)})
+		listofMBs.append("mb30"+str(x))
+	return listofMBs
 
 def runthetest(sizeoffattree,itera,listofpath):
 	print ">>>>>>>start the test with size of %s for the time No.%d" %(sizeoffattree,itera)
-	driver = GraphDatabase.driver("bolt://localhost", auth=basic_auth("neo4j", "ravel"))
+	driver = GraphDatabase.driver("bolt://localhost", auth=basic_auth("neo4j", "gavel"))
 	session = driver.session()
 	session.run('''match (n)-[r]-() return count(n)''')
 	
@@ -36,11 +49,12 @@ def runthetest(sizeoffattree,itera,listofpath):
 	listoftimeb = []
 	result = session.run('''Match (h:Switch) return h.dpid AS dpid ''')
 	resultlistnotrandom = list(result)
-	resultlist = random.sample(resultlistnotrandom,9)
+	'''resultlist = random.sample(resultlistnotrandom,9)
 	NFone = NetworkFunction(100,[resultlist[0]["dpid"],resultlist[4]["dpid"],resultlist[3]["dpid"]])
 	NFtwo = NetworkFunction(200,[resultlist[7]["dpid"],resultlist[2]["dpid"],resultlist[1]["dpid"]])
-	NFthree = NetworkFunction(300,[resultlist[8]["dpid"],resultlist[6]["dpid"],resultlist[5]["dpid"]])
-	listofSFC = [NFone,NFtwo,NFthree]
+	NFthree = NetworkFunction(300,[resultlist[8]["dpid"],resultlist[6]["dpid"],resultlist[5]["dpid"]])'''
+	numberofMBs = 4
+	listofSFC = installMBs(session, resultlistnotrandom, numberofMBs)
 	
 	result = session.run('''Match (h:Host) return h.ip AS ip ''')
 	resultlistnotrandom = list(result)
