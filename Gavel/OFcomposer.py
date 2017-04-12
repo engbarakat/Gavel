@@ -7,3 +7,9 @@ def msgOF(msgtosend,*arg):
 	#installpath will do it into two directions
 	pass
 
+def installpath():
+	pass
+
+def deletepath():
+	pass
+

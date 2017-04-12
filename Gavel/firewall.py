@@ -5,7 +5,7 @@ from route import *
 
 def blockHost(session,hostIP):
 	
-	result = session.run('''Match (h1:Host{ip:{firstip}}) -[r:Connected_to]->(s2:Switch) REMOVE h1:Host SET h1:blockedHost return  distinct s2.dpid; ''',{"firstip": hostIP} )
+	result = session.run('''Match (h1:Host{ip:{firstip}}) -[r:Connected_to]->(s2:Switch) REMOVE h1:Host SET h1:blockedHost return  s2.dpid; ''',{"firstip": hostIP} )
 	for hostblocked in result:
 		msgOF("blockHost",hostIP,hostblocked['s2.dpid'])
 		return
@@ -28,7 +28,7 @@ def blockPath(session, srcIP,dstIP):
 		if sw["r2.switches"] is not None:
 			#print "Blocking Path from %s to %s was successful"%(srcIP,dstIP)
 			#print sw["switch"] # get switch DPID
-			msgOF("blockPath",srcIP,dstIP)
+			msgOF("blockPath",srcIP,dstIP,sw['r2.switches'])
 			return
 		return
 	result = session.run('''MATCH (h1:Host {ip:{firstip}}), (h2:Host {ip:{secondip}}) Match p=shortestPath((h1)-[:Connected_to*]->(h2)) with h1,h2, p
@@ -38,7 +38,7 @@ def blockPath(session, srcIP,dstIP):
 
 def unblockHost(session, hostIP):
 	
-	result = session.run('''Match (h1:blockedHost{ip:{firstip}}) -[r:Connected_to]->(s2:Switch) REMOVE h1:blockedHost SET h1:Host return  distinct s2.dpid;''',{"firstip": hostIP} )
+	result = session.run('''Match (h1:blockedHost{ip:{firstip}}) -[r:Connected_to]->(s2:Switch) REMOVE h1:blockedHost SET h1:Host return   s2.dpid;''',{"firstip": hostIP} )
 	for hostblocked in result:
 		msgOF("unblockHost",hostblocked['s2.dpid'])
 		return
@@ -63,7 +63,7 @@ def unblockPath(session, srcIP,dstIP):
 		if sw["r2.switches"] is not None:
 			#print "Unblocking Path from %s to %s was successful"%(srcIP,dstIP)
 			#print sw["switch"] # get switch DPID
-			msgOF("unblockPath",srcIP,dstIP)
+			msgOF("unblockPath",srcIP,dstIP,sw['r2.switches'])
 		return
 	return False
 	#print "Unblocking Path from %s to %s was NOT successful! Are you sure it exists or already not blocked?!"%(srcIP,dstIP)
