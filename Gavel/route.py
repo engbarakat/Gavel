@@ -26,7 +26,7 @@ def getroute(session, srcIP, dstIP):
 	result = session.run('''MATCH (h1:Host {ip:{firstip}}), (h2:Host {ip:{secondip}}) Match p=shortestPath((h1)-[:Connected_to*]->(h2)) with h1,h2, p
 	create (h1)-[pa:Path_to{switches:[n in nodes(p)[1..-1]| n.dpid], ports:[r in rels(p)[1..]| r.port1]}]->(h2) return pa.switches, pa.ports;''',{"firstip": srcIP, "secondip": dstIP} )
 	for pathins in result:
-		msgOF("installflow",pathins["pa.switches"],pathins["pa.ports"])
+		msgOF("installflow",switches = pathins["pa.switches"],portsforward = pathins["pa.ports"],portsbackward = None , src = srcIP, dst =dstIP )
 		return True
 	return False
 
