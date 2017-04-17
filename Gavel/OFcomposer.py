@@ -1,11 +1,3 @@
-def installpathofmsg(dpid,fport,bport,srcIP,dstIP):
-	pass
-def deletepathofmsg(dpid,fport,bport,srcIP,dstIP):
-	pass
-def drophostofmsg(dpid,hostIP):
-	pass
-def undrophostofmsg(dpid,hostIP):
-	pass
 
 def installpath(**kwargs):#switches = pathins["pa.switches"],portsforward = pathins["pa.ports"],portsbackward = None , src = srcIP, dst =dstIP
 	for switch, fport,bport in zip(kwargs['switches'],kwargs['portsforward'],kwargs['portsbackward']):
@@ -26,11 +18,15 @@ def unblockhost(**kwargs):
 	for switch in kwargs['switch']:
 		undrophostofmsg(switch, kwargs['blockedHost'])
 
-def blockpath(**kwargs):
-	pass
-
+def blockpath(**kwargs):#src = srcIP,dst = dstIP,switch = sw['r2.switches']
+	for switch in kwargs['switch']:
+		droppathofmsg(switch, kwargs['src'],kwargs['dst'])
+	
 def unblockpath(**kwargs):
-	pass
+	for switch in kwargs['switch']:
+		undroppathofmsg(switch, kwargs['src'],kwargs['dst'])
+
+
 def installsfc(**kwargs):
 	pass
 
@@ -48,6 +44,5 @@ def msgOF(msgtosend,**kwargs):
 	options[msgtosend](**kwargs)
 	#print msgtosend + " OF message sent !"
 	#installpath will do it into two directions
-	pass
 
 
