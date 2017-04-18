@@ -38,7 +38,7 @@ class PoxManager(OfManager):
             self.log.info("registering handlers")
             core.openflow_discovery.addListeners(self)
 
-        core.call_when_ready(startup, ("openflow", "openflow_discovery"))
+        core.call_when_ready(startup, ("openflow", "openflow_discovery"))# will detect link activity by send LLDP to detect topology
 
     def update_switch_cache(self):
         self.db.cursor.execute("SELECT * FROM switches;")
