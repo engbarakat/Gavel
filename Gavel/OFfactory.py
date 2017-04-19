@@ -1,20 +1,105 @@
 
 
-def installpathofmsg(dpid,fport,bport,srcIP,dstIP):
+class OvsSender(MessageSender):#from ravel
+    "A message sender using ovs-ofctl to communicate with switches"
+
+    command = "/usr/bin/sudo /usr/bin/ovs-ofctl"
+    subcmds = { OFPFC_ADD : "add-flow",
+                OFPFC_DELETE : "del-flows",
+                OFPFC_DELETE_STRICT : "--strict del-flows"
+    }
+
+    def __init__(self):
+        pass
+
+    def send(self, msg):
+        """Send the specified OpenFlow message
+           msg: the message to send"""
+
+        # don't need to handle barrier messages
+        if not hasattr(msg, 'command'):
+            return
+
+        subcmd = OvsSender.subcmds[msg.command]
+
+        # TODO: this is different for remote switches (ie, on physical network)
+        dest = msg.switch.name
+
+        params = []
+        if msg.match.nw_src is not None:
+            params.append("nw_src={0}".format(msg.match.nw_src))
+        if msg.match.nw_dst is not None:
+            params.append("nw_dst={0}".format(msg.match.nw_dst))
+        if msg.match.dl_src is not None:
+            params.append("dl_src={0}".format(msg.match.dl_src))
+        if msg.match.dl_dst is not None:
+            params.append("dl_dst={0}".format(msg.match.dl_dst))
+        if msg.match.dl_type is not None:
+            params.append("dl_type={0}".format(msg.match.dl_type))
+
+        params.append("priority={0}".format(msg.priority))
+        actions = ["flood" if a == OFPP_FLOOD else str(a) for a in msg.actions]
+
+        if msg.command == OFPFC_ADD:
+            params.append("action=output:" + ",".join(actions))
+
+        paramstr = ",".join(params)
+        cmd = "{0} {1} {2} {3}".format(OvsSender.command,
+                                       subcmd,
+                                       dest,
+                                       paramstr)
+        ret = os.system(cmd)
+        return ret
+
+
+def _send_msg(command,  sw, src_ip, src_mac, dst_ip, dst_mac, outport, revoutport):#from Ravel, used to send any msg based on the channel, I use here only OVS channel
+    conn = OvsSender()
+    msg1 = OfMessage(command=command,
+                     priority=10,
+                     switch=sw,
+                     match=Match(nw_src=src_ip, nw_dst=dst_ip, dl_type=0x0800),
+                     actions=[outport])
+
+    msg2 = OfMessage(command=command,
+                     priority=10,
+                     switch=sw,
+                     match=Match(nw_src=dst_ip, nw_dst=src_ip, dl_type=0x0800),
+                     actions=[revoutport])
+
+    arp1 = OfMessage(command=command,
+                     priority=1,
+                     switch=sw,
+                     match=Match(dl_src=src_mac, dl_type=0x0806),
+                     actions=[OFPP_FLOOD])
+
+    arp2 = OfMessage(command=command,
+                     priority=1,
+                     switch=sw,
+                     match=Match(dl_src=dst_mac, dl_type=0x0806),
+                     actions=[OFPP_FLOOD])
+
+    conn.send(msg1)
+    conn.send(msg2)
+    conn.send(arp1)
+    conn.send(arp2)
+    conn.send(BarrierMessage(sw.dpid))
+
+def installpathofmsg(dpid,fport,bport,srcIP,dstIP,srcMAC,dstMAC):
+    _send_msg(OFPFC_ADD, dpid, srcIP, srcMAC, dstIP, dstMAC, fport, bport)
+    
+def deletepathofmsg(dpid,fport,bport,srcIP,dstIP,srcMAC,dstMAC):
     pass
-def deletepathofmsg(dpid,fport,bport,srcIP,dstIP):
+def drophostofmsg(dpid,hostIP,hostMAC):
     pass
-def drophostofmsg(dpid,hostIP):
-    pass
-def undrophostofmsg(dpid,hostIP):
+def undrophostofmsg(dpid,hostIP,hostMAC):
     pass
 
-def droppathofmsg(dpid,srcIP,dstIP):
+def droppathofmsg(dpid,srcIP,dstIP,srcMAC,dstMAC):
     pass
-def undroppathofmsg(dpid,srcIP,dstIP):
+def undroppathofmsg(dpid,srcIP,dstIP,srcMAC,dstMAC):
     pass
-
-
+################### from 
+########################## from flow.py#############
 import os
 import pickle
 import threading
