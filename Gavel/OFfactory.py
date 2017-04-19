@@ -1,5 +1,30 @@
+class Match(object):
+    "A match object for an OpenFlow flow modification message"
 
+    def __init__(self, nw_src=None, nw_dst=None,
+                dl_src=None, dl_dst=None, dl_type=None):
+       """nw_src: the source node's network address
+          nw_dst: the destination node's network address
+          dl_src: the source node's datalink address
+          dl_dst: the destination node's datalink address
+          dl_type: the datalink type"""
+       self.nw_src = nw_src
+       self.nw_dst = nw_dst
+       self.dl_src = dl_src
+       self.dl_dst = dl_dst
+       self.dl_type = dl_type
 
+    def __repr__(self):
+        return str(self)
+
+    def __str__(self):
+        return "[{0},{1},{2},{3},{4}]".format(self.nw_src,
+                                              self.nw_dst,
+                                              self.dl_src,
+                                              self.dl_dst,
+                                              self.dl_type)
+#TODO: 1. Match class writing 
+#2.add mac to the cypher queries. 
 class OvsSender(MessageSender):#from ravel
     "A message sender using ovs-ofctl to communicate with switches"
 
