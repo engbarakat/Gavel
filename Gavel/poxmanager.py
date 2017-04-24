@@ -3,6 +3,12 @@
 Pox-based OpenFlow manager
 """
 
+"""
+To Do: 1. fix lunch function
+2. implement packet_In event
+3.flowstats send and receive implementation.
+"""
+
 import pox.openflow.libopenflow_01 as of
 from pox.core import core
 from pox.lib.recoco import *
