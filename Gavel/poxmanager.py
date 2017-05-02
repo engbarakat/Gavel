@@ -4,8 +4,10 @@ Pox-based OpenFlow manager
 """
 
 """
-To Do: 1. fix lunch function
-2. implement packet_In event
+To Do:
+0.Write the main scenario to test the code. 
+1. fix lunch function
+2. implement packet_In event Done
 3.flowstats send and receive implementation.
 """
 
@@ -25,20 +27,17 @@ log = core.getLogger()
 class PoxManager():
     "Pox-based OpenFlow manager"
 
-    def __init__(self, log, dbname, dbuser):
-        self.db = RavelDb(dbname, dbuser, None, reconnect=True)
-        self.log = log
+    def __init__(self):
         self.datapaths = {}
         self.receiver = []
         self.flowstats = []
-        self.perfcounter = PerfCounter("sw_delay")
         self.dpid_cache = {}
 
         core.openflow.addListeners(self, priority=0)
-        self.log.info("ravel: starting pox manager")
+        
 
         def startup():
-            self.log.info("registering handlers")
+            
             core.openflow_discovery.addListeners(self)
 
         core.call_when_ready(startup, ("openflow", "openflow_discovery"))# will detect link activity by send LLDP to detect topology
@@ -63,7 +62,7 @@ class PoxManager():
     def _handle_ConnectionUp(self, event):
         #when a control connection to the switch is up
         dpid = "%0.16x" % event.dpid
-        self.update_switch_cache()
+        #self.update_switch_cache()
         self.datapaths[event.dpid] = event.connection
         addswitchGavel(dpid)
 
@@ -75,8 +74,8 @@ class PoxManager():
         dpid2 = "%0.16x" % event.link.dpid2
         port1 = event.link.port1
         port2 = event.link.port2
-        sid1 = self.dpid_cache[dpid1]['sid']
-        sid2 = self.dpid_cache[dpid2]['sid']
+        #sid1 = self.dpid_cache[dpid1]['sid']
+        #sid2 = self.dpid_cache[dpid2]['sid']
 
         if event.removed:
             dellinkGavel(dpid2,port2,dpid1,port1)
@@ -99,11 +98,7 @@ class PoxManager():
         
 
     def _handle_FlowStatsReceived(self, event):
-        self.log.info("ravel: flow stat received dpid={0}, len={1}".format(
-            event.connection.dpid, len(event.stats)))
-        for stat in event.stats:
-            self.log.info("   flow: nw_src={0}, nw_dst={1}".format(
-                stat.match.nw_src, stat.match.nw_dst))
+        pass
 
     def requestStats(self):
         "Send all switches a flow statistics request"
@@ -111,8 +106,7 @@ class PoxManager():
         for connection in core.openflow._connections.values():
             connection.send(of.ofp_stats_request(body=of.ofp_flow_stats_request()))
 
-        self.log.debug("ravel: sent {0} flow stats requests".format(
-            len(core.openflow._connections)))
+        
 
         return True
 
@@ -186,9 +180,9 @@ class PoxManager():
             receiver.stop()
 def launch():
     "Start the OpenFlow manager and message receivers"
-    ctrl = PoxManager(log, Config.DbName, Config.DbUser)
-    mq = MsgQueueReceiver(Config.QueueId, ctrl)
-    ctrl.registerReceiver(mq)
-    rpc = RpcReceiver(Config.RpcHost, Config.RpcPort, ctrl)
-    ctrl.registerReceiver(rpc)
-    core.register("ravelcontroller", ctrl)
+    ctrl = PoxManager()
+    #mq = MsgQueueReceiver(Config.QueueId, ctrl)
+    #ctrl.registerReceiver(mq)
+    #rpc = RpcReceiver(Config.RpcHost, Config.RpcPort, ctrl)
+    #ctrl.registerReceiver(rpc)
+    core.register("gavelcontroller", ctrl)
