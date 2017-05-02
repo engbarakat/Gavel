@@ -17,6 +17,8 @@ from pox.lib.addresses import IPAddr, EthAddr
 from pox.lib.util import dpid_to_str
 from pox.lib.util import str_to_dpid
 from updateGavel import *
+from route import *
+
 
 log = core.getLogger()
 
@@ -85,6 +87,16 @@ class PoxManager():
             addlinkGavel(dpid2,port2,dpid1,port1)
     def _handle_BarrierIn(self, event):
         pass
+    def _handle_PacketIn(self, event):
+        packet = event.parsed
+        if packet.type == ethernet.LLDP_TYPE:
+            # Ignore LLDP packets
+            return
+        srcip = packet.find("ipv4").srcip
+        dstip = packet.find("ipv4").dstip
+        return route.getroute(installconnection(),str(srcip),str(dstip))
+        """call routing app"""
+        
 
     def _handle_FlowStatsReceived(self, event):
         self.log.info("ravel: flow stat received dpid={0}, len={1}".format(
