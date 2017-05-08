@@ -1,6 +1,7 @@
 
 # contains code to update gavel from pox raised events.
 from neo4j.v1 import GraphDatabase, basic_auth
+import os
 
 
 #TODO  check logic from poxmanager original file and implements the functions
@@ -54,3 +55,8 @@ def addlinkGavel(dpid2,port2,dpid1,port1):#no2 is the from and no1 is to // You 
 def dellinkGavel(dpid2,port2,dpid1,port1):#no2 is the from and no1 is to
     session = installconnection()
     result = session.run("Match (s1:Switch {dpid:{switchdpid}})-[r]-(s2:Switch {dpid:{switchdpido}}) delete r ",{"switchdpid":dpid2,"switchdpido":dpid1})
+
+def loaddb(topologyname):
+    #load gavel database topology
+    session = installconnection()
+    os.system("neo4j-shell -file new_gdb%s.cypher -host localhost -v" %topologyname)

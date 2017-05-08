@@ -24,7 +24,7 @@ from route import *
 
 log = core.getLogger()
 
-class PoxManager():
+class PoxManager(topologyname):
     "Pox-based OpenFlow manager"
 
     def __init__(self):
@@ -32,12 +32,12 @@ class PoxManager():
         self.receiver = []
         self.flowstats = []
         self.dpid_cache = {}
+        updateGavel.loaddb(topologyname)
 
         core.openflow.addListeners(self, priority=0)
         
 
         def startup():
-            
             core.openflow_discovery.addListeners(self)
 
         core.call_when_ready(startup, ("openflow", "openflow_discovery"))# will detect link activity by send LLDP to detect topology
