@@ -16,15 +16,18 @@ from pox.core import core
 from pox.lib.recoco import *
 from pox.lib.revent import *
 from pox.lib.addresses import IPAddr, EthAddr
+from pox.lib.packet.ethernet import ethernet
+from pox.lib.packet.ipv4 import ipv4
+from pox.lib.packet.arp import arp
 from pox.lib.util import dpid_to_str
 from pox.lib.util import str_to_dpid
 from updateGavel import *
 from route import *
 
 
-log = core.getLogger()
 
-class PoxManager(topologyname):
+
+class PoxManager():
     "Pox-based OpenFlow manager"
 
     def __init__(self):
@@ -32,7 +35,7 @@ class PoxManager(topologyname):
         self.receiver = []
         self.flowstats = []
         self.dpid_cache = {}
-        updateGavel.loaddb(topologyname)
+        loaddb()
 
         core.openflow.addListeners(self, priority=0)
         
@@ -86,15 +89,56 @@ class PoxManager(topologyname):
             addlinkGavel(dpid2,port2,dpid1,port1)
     def _handle_BarrierIn(self, event):
         pass
+    
     def _handle_PacketIn(self, event):
+        
+        dpid = event.connection.dpid
+        inport = event.port
         packet = event.parsed
-        if packet.type == ethernet.LLDP_TYPE:
-            # Ignore LLDP packets
+        
+        if not packet.parsed:
             return
+
+        if packet.type == ethernet.LLDP_TYPE:
+            return
+
+        if not core.openflow_discovery.is_edge_port(dpid, inport):
+            return
+        
+        if isinstance(packet.next, arp):
+            if (packet.next.hwtype == arp.HW_TYPE_ETHERNET and packet.next.prototype == arp.PROTO_TYPE_IP and packet.next.protosrc !=0):
+                mac_addr = str(packet.src)
+                ip_addr = str(packet.next.protosrc)
+
+                if mac_addr in graph.nodes():
+                    graph.node[mac_addr]['ip']=ip_addr
+
+
+        
         srcip = packet.find("ipv4").srcip
         dstip = packet.find("ipv4").dstip
         return route.getroute(installconnection(),str(srcip),str(dstip))
-        """call routing app"""
+    
+    def _handle_host_tracker_HostEvent(self, event):
+        
+        s = dpid_to_str(event.entry.dpid)
+        macstr = str(event.entry.macaddr)
+
+        if event.leave == True:
+            if macstr in graph.nodes():
+                graph.remove_node(macstr)
+        else:
+            if macstr not in graph.nodes():
+                graph.add_node(macstr,type='host')
+            if s not in graph.nodes():
+                graph.add_node(s,type='switch')
+            s1 = s
+            s2 = macstr
+            if s1 > s2: s1,s2 = s2, s1
+
+            e = (s1,s2)
+            if e not in graph.edges():
+                graph.add_edge(*e)
         
 
     def _handle_FlowStatsReceived(self, event):

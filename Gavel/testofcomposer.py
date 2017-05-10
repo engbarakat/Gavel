@@ -13,6 +13,43 @@ a. start mininet and gavel with the same topology file.
 b. start call routing and sfc and other functions on Gavel and check if OFcomposer responds accordingly.
 """
 
+import os
+import sys
+import subprocess
+
+def preexec_fn():
+    # don't forward signals to child process
+    # we need this when starting a Pox subprocess, so that SIGINTs from the CLI
+    # aren't forwarded to Pox, causing it to terminate early
+    os.setpgrp()
+
+def append_path(path):
+    path = os.path.expanduser(path)
+    print path
+    if "PYTHONPATH" not in os.environ:
+        os.environ["PYTHONPATH"] = ""
+
+    sys.path = os.environ["PYTHONPATH"].split(":") + sys.path
+
+    if path is None or path == "":
+        path = "."
+
+    if path not in sys.path:
+        sys.path.append(path)
+    print sys.path
 
 
+install_path = os.path.dirname(os.path.abspath(__file__))
+install_path = os.path.normpath(os.path.join(install_path, ".."))
+print install_path
 
+pox = os.path.join("/home/gavel/pox", "pox.py")
+cargs = ["log.level","--DEBUG","openflow.of_01","poxmanager","openflow.discovery"]
+
+append_path(install_path)
+env = os.environ.copy()
+env["PYTHONPATH"] = ":".join(sys.path)
+print env["PYTHONPATH"]
+subprocess.Popen([pox] + cargs,env=env)
+#subprocess.Popen([pox] + cargs,env=env,preexec_fn = preexec_fn)
+#,stdout=open("/tmp/pox.log", "wb"),stderr=open("/tmp/pox.err", "wb")
