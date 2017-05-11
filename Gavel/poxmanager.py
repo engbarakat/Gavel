@@ -102,44 +102,33 @@ class PoxManager():
         if packet.type == ethernet.LLDP_TYPE:
             return
 
-        if not core.openflow_discovery.is_edge_port(dpid, inport):
-            return
-        
-        if isinstance(packet.next, arp):
-            if (packet.next.hwtype == arp.HW_TYPE_ETHERNET and packet.next.prototype == arp.PROTO_TYPE_IP and packet.next.protosrc !=0):
-                mac_addr = str(packet.src)
-                ip_addr = str(packet.next.protosrc)
-
-                if mac_addr in graph.nodes():
-                    graph.node[mac_addr]['ip']=ip_addr
-
-
-        
+        #if not core.openflow_discovery.is_edge_port(dpid, inport):
+            #return
         srcip = packet.find("ipv4").srcip
         dstip = packet.find("ipv4").dstip
         return route.getroute(installconnection(),str(srcip),str(dstip))
     
-    def _handle_host_tracker_HostEvent(self, event):
-        
-        s = dpid_to_str(event.entry.dpid)
-        macstr = str(event.entry.macaddr)
-
-        if event.leave == True:
-            if macstr in graph.nodes():
-                graph.remove_node(macstr)
-        else:
-            if macstr not in graph.nodes():
-                graph.add_node(macstr,type='host')
-            if s not in graph.nodes():
-                graph.add_node(s,type='switch')
-            s1 = s
-            s2 = macstr
-            if s1 > s2: s1,s2 = s2, s1
-
-            e = (s1,s2)
-            if e not in graph.edges():
-                graph.add_edge(*e)
-        
+#     def _handle_host_tracker_HostEvent(self, event):
+#    #I have delayed this function and will load the same topology file to both mininet and gavel to save time
+#         
+#         s = dpid_to_str(event.entry.dpid)
+#         macstr = str(event.entry.macaddr)
+# 
+#         if event.leave == True:
+#             if macstr in graph.nodes():
+#                 graph.remove_node(macstr)
+#         else:
+#             if macstr not in graph.nodes():
+#                 graph.add_node(macstr,type='host')
+#             if s not in graph.nodes():
+#                 graph.add_node(s,type='switch')
+#             s1 = s
+#             s2 = macstr
+#             if s1 > s2: s1,s2 = s2, s1
+# 
+#             e = (s1,s2)
+#             if e not in graph.edges():
+#                 graph.add_edge(*e)
 
     def _handle_FlowStatsReceived(self, event):
         pass
