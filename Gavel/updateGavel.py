@@ -29,15 +29,6 @@ def addswitchGavel(dpid):
     result = session.run("Merge (s:Switch {dpid: {switchdpid}}) on create set s.id = {switchdpid};",{"switchdpid":dpid})
     
 
-'''def addhostGavel(ipaddr, id, macaddr):
-    session = installconnection()
-    result = session.run(,{})
-    pass
-
-def delhostGavel(ipaddr):
-    session = installconnection()
-    result = session.run(,{})
-    pass'''
 
 def delswitchGavel(dpid):
     driver = GraphDatabase.driver("bolt://localhost", auth=basic_auth("neo4j", "gavel"))
@@ -64,11 +55,28 @@ def dellinkGavel(dpid2,port2,dpid1,port1):#no2 is the from and no1 is to
     session = driver.session()
     result = session.run("Match (s1:Switch {dpid:{switchdpid}})-[r]-(s2:Switch {dpid:{switchdpido}}) delete r ",{"switchdpid":dpid2,"switchdpido":dpid1})
     
-def addhostGavel(macaddr,ipaddr):
-    pass
+def addhostGavel(macaddr,ipaddr,dpid,switchport):
+    """
+    Add the host and add the connectoin to switch
+    """
+    driver = GraphDatabase.driver("bolt://localhost", auth=basic_auth("neo4j", "gavel"))
+    session = driver.session()
+    result = session.run("Merge (s:Host {mac: {switchdpid}}) on create set s.id = {switchdpid}, s.ip={hostip};",{"switchdpid":macaddr,"hostip":ipaddr})
+    result = session.run( ''' MATCH (s2:Switch {dpid: {switchdpid2}})
+                              MATCH (h1:Host {ip: {hostip1}})
+                              MERGE (h1)-[r:Connected_to]->(s2)
+                              ON CREATE SET r.port1 = -1, r.port2 = {rowport2}, r.node1 = {hostip1}, r.node2={switchdpid2},r.cost = {rowport2}
+                              MERGE (s2)-[re:Connected_to]->(h1)
+                              ON CREATE SET re.port1 = {rowport2}, re.port2 = -1, re.node1 = {switchdpid2}, re.node2={hostip1},re.cost = {rowport2};
+                              ''',{"rowport2":port2,"hostip1":ipaddr,"switchdpid2":dpid2})
 
 def deletehostGavel(macaddr):
-    pass
+    """
+    Make sure to delete all connections that they have in the database
+    """
+    driver = GraphDatabase.driver("bolt://localhost", auth=basic_auth("neo4j", "gavel"))
+    session = driver.session()
+    result = session.run("Detach delete (n: Host {mac:{switchdpid}})",{"switchdpid":macaddr})
 
 def addlinkhostGavel():
     pass

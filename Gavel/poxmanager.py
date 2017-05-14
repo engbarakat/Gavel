@@ -9,6 +9,11 @@ To Do:
 1. fix lunch function
 2. implement packet_In event Done
 3.flowstats send and receive implementation.
+
+Now new support
+1. add switch,host,link classes
+2. check if they are exisit as a cashe.
+3.delete and add switch temproray in set
 """
 
 import pox.openflow.libopenflow_01 as of
@@ -24,6 +29,14 @@ from pox.lib.util import str_to_dpid
 from updateGavel import *
 from route import *
 
+class Switch():
+    def __init__(self,dpid):
+        self.dpid = dpid
+        self.id = dpid
+class Host():
+    def __init__(self,macaddr,IPaddr):
+        self.macaddr = macaddr
+        self.ipaddr = IPaddr
 
 
 
@@ -35,6 +48,8 @@ class PoxManager():
         self.receiver = []
         self.flowstats = []
         self.dpid_cache = {}
+        self.switches = set()
+        self.hosts = set()
         loaddb()
 
         core.openflow.addListeners(self, priority=0)
@@ -59,14 +74,14 @@ class PoxManager():
     def _handle_ConnectionDown(self, event):
         #when a control connection to the switch is lost
         dpid = "%0.16x" % event.dpid
-        del self.datapaths[event.dpid]
+        self.switches.discard(dpid)
         delswitchGavel(dpid)
         
     def _handle_ConnectionUp(self, event):
         #when a control connection to the switch is up
         dpid = "%0.16x" % event.dpid
         #self.update_switch_cache()
-        self.datapaths[event.dpid] = event.connection
+        self.switches.update(dpid)
         addswitchGavel(dpid)
 
         
@@ -108,27 +123,23 @@ class PoxManager():
         dstip = packet.find("ipv4").dstip
         return route.getroute(installconnection(),str(srcip),str(dstip))
     
-#     def _handle_host_tracker_HostEvent(self, event):
-#    #I have delayed this function and will load the same topology file to both mininet and gavel to save time
-#         
-#         s = dpid_to_str(event.entry.dpid)
-#         macstr = str(event.entry.macaddr)
-# 
-#         if event.leave == True:
-#             if macstr in graph.nodes():
-#                 graph.remove_node(macstr)
-#         else:
-#             if macstr not in graph.nodes():
-#                 graph.add_node(macstr,type='host')
-#             if s not in graph.nodes():
-#                 graph.add_node(s,type='switch')
-#             s1 = s
-#             s2 = macstr
-#             if s1 > s2: s1,s2 = s2, s1
-# 
-#             e = (s1,s2)
-#             if e not in graph.edges():
-#                 graph.add_edge(*e)
+    def _handle_host_tracker_HostEvent(self, event):
+    #I have delayed this function and will load the same topology file to both mininet and gavel to save time
+         
+         s = dpid_to_str(event.entry.dpid)
+         macstr = str(event.entry.macaddr)
+         
+         sport = str(event.entry.port)
+         hipaddr = event.entry.ipAddrs.iterkeys().next()
+ 
+         if event.leave == True:
+             deletehostGavel(macstr)
+             self.hosts.discard(macstr)
+         else:
+             if macstr not in self.hosts:
+                 addhostGavel(macstr,hipaddr,s,sport)
+                 self.hosts.update(macstr)
+             
 
     def _handle_FlowStatsReceived(self, event):
         pass
