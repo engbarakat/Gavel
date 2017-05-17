@@ -25,7 +25,7 @@ def preexec_fn():
 
 def append_path(path):
     path = os.path.expanduser(path)
-    print path
+    #print path
     if "PYTHONPATH" not in os.environ:
         os.environ["PYTHONPATH"] = ""
 
@@ -36,20 +36,20 @@ def append_path(path):
 
     if path not in sys.path:
         sys.path.append(path)
-    print sys.path
+    #print sys.path
 
 
 install_path = os.path.dirname(os.path.abspath(__file__))
 install_path = os.path.normpath(os.path.join(install_path, ".."))
-print install_path
+#print install_path
 
 pox = os.path.join("/home/gavel/pox", "pox.py")
-cargs = ["log.level","--DEBUG","openflow.of_01","poxmanager","openflow.discovery"]
+cargs = ["log.level","--DEBUG","openflow.of_01","poxmanager","openflow.discovery","host_tracker"]
 
 append_path(install_path)
 env = os.environ.copy()
 env["PYTHONPATH"] = ":".join(sys.path)
-print env["PYTHONPATH"]
+#print env["PYTHONPATH"]
 subprocess.Popen([pox] + cargs,env=env)
 #subprocess.Popen([pox] + cargs,env=env,preexec_fn = preexec_fn)
 #,stdout=open("/tmp/pox.log", "wb"),stderr=open("/tmp/pox.err", "wb")

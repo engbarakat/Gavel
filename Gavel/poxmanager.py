@@ -2,6 +2,7 @@
 """
 Pox-based OpenFlow manager
 """
+from mx.DateTime.timegm import dst
 
 """
 To Do:
@@ -18,6 +19,7 @@ Now new support
 
 import pox.openflow.libopenflow_01 as of
 from pox.core import core
+import pox.host_tracker
 from pox.lib.recoco import *
 from pox.lib.revent import *
 from pox.lib.addresses import IPAddr, EthAddr
@@ -38,7 +40,7 @@ class Host():
         self.macaddr = macaddr
         self.ipaddr = IPaddr
 
-
+log = core.getLogger()
 
 class PoxManager():
     "Pox-based OpenFlow manager"
@@ -50,16 +52,21 @@ class PoxManager():
         self.dpid_cache = {}
         self.switches = set()
         self.hosts = set()
+        self.hostsip =  set()
+        core.listen_to_dependencies(self)
         loaddb()
 
         core.openflow.addListeners(self, priority=0)
-        
+        #core.host_tracker.addListenerByName("HostEvent", self._handle_host_tracker_HostEvent)
 
         def startup():
             core.openflow_discovery.addListeners(self)
 
         core.call_when_ready(startup, ("openflow", "openflow_discovery"))# will detect link activity by send LLDP to detect topology
 
+    def _handle_core_ComponentRegistered (self, event):
+        if event.name == "host_tracker":
+            event.component.addListenerByName("HostEvent",self._handle_host_tracker_HostEvent)
     def update_switch_cache(self): 
         #rewrite
         self.db.cursor.execute("SELECT * FROM switches;")
@@ -73,23 +80,29 @@ class PoxManager():
 
     def _handle_ConnectionDown(self, event):
         #when a control connection to the switch is lost
-        dpid = "%0.16x" % event.dpid
+        #dpid ="%0.16x" % event.dpid
+        dpid = dpid_to_str(event.dpid)
         self.switches.discard(dpid)
         delswitchGavel(dpid)
         
     def _handle_ConnectionUp(self, event):
         #when a control connection to the switch is up
-        dpid = "%0.16x" % event.dpid
+        #dpid ="%0.16x" % event.dpid
+        dpid = dpid_to_str(event.dpid)
+        name = "s" + str(int(str(event.dpid)))
         #self.update_switch_cache()
-        self.switches.update(dpid)
-        addswitchGavel(dpid)
+        if dpid not in self.switches:
+            self.switches.add(dpid)
+            addswitchGavel(dpid,name)
 
         
 
     def _handle_LinkEvent(self, event):
         #handel links events
-        dpid1 = "%0.16x" % event.link.dpid1
-        dpid2 = "%0.16x" % event.link.dpid2
+        #dpid1 = "%0.16x" % event.link.dpid1
+        #dpid2 = "%0.16x" % event.link.dpid2
+        dpid1 = dpid_to_str(event.link.dpid1)
+        dpid2 = dpid_to_str(event.link.dpid2)
         port1 = event.link.port1
         port2 = event.link.port2
         #sid1 = self.dpid_cache[dpid1]['sid']
@@ -106,22 +119,34 @@ class PoxManager():
         pass
     
     def _handle_PacketIn(self, event):
-        
-        dpid = event.connection.dpid
+         
+        dpid = dpid_to_str(event.connection.dpid)
         inport = event.port
         packet = event.parsed
         
         if not packet.parsed:
-            return
-
+             return
+ 
         if packet.type == ethernet.LLDP_TYPE:
+             return
+ 
+         #if not core.openflow_discovery.is_edge_port(dpid, inport):
+             #return
+        ip =  packet.find("ipv4")
+        log.info("^^^^^^^^^^^^ a packet arrived with type {0}".format(str(packet.type)))
+        if ip is None:
             return
-
-        #if not core.openflow_discovery.is_edge_port(dpid, inport):
-            #return
-        srcip = packet.find("ipv4").srcip
-        dstip = packet.find("ipv4").dstip
-        return route.getroute(installconnection(),str(srcip),str(dstip))
+        
+        srcip = ip.srcip
+        dstip = ip.dstip
+        log.info("**********************packet arrived with source {0} and Destination {1}".format(srcip,dstip))
+        log.info (str(self.hostsip))
+        log.info("the srcip {0} in hostsip ? {1}".format(srcip, (str(srcip) in self.hostsip)))
+        log.info("the dstip {0} in hostsip ? {1}".format(dstip, (str(dstip) in self.hostsip)))
+        if str(srcip) in self.hostsip:
+            if str(dstip) in self.hostsip:
+                log.info("&&&&&&&&&& send get route request")
+                return getroute(str(srcip),str(dstip))
     
     def _handle_host_tracker_HostEvent(self, event):
     #I have delayed this function and will load the same topology file to both mininet and gavel to save time
@@ -130,15 +155,27 @@ class PoxManager():
          macstr = str(event.entry.macaddr)
          
          sport = str(event.entry.port)
-         hipaddr = event.entry.ipAddrs.iterkeys().next()
+         #hipaddr = str(event.entry.ipaddr)
+         #hipaddr = None
+         #hipaddr = str(event.entry.ipAddrs.keys()[0])
+         
+         #    hipaddr = str(key)
+         #    break
+         
  
          if event.leave == True:
-             deletehostGavel(macstr)
-             self.hosts.discard(macstr)
+             #deletehostGavel(macstr)
+             #self.hosts.discard(macstr)
+             #self.hostsip.discard(hipaddr)
+             log.info(" Host macaddr {0}deleted".format(macstr))
          else:
-             if macstr not in self.hosts:
+             if (macstr not in self.hosts):
+                 self.hosts.add(macstr)
+                 hipaddr = str(event.entry.ipAddrs.iterkeys().next())
+                 log.info("New Host event fired with macaddr {0} Ip addr {1} with switch {2} and port {3}".format(macstr,hipaddr,s,sport))
+                 self.hostsip.add(hipaddr)
                  addhostGavel(macstr,hipaddr,s,sport)
-                 self.hosts.update(macstr)
+                 
              
 
     def _handle_FlowStatsReceived(self, event):
@@ -225,8 +262,9 @@ class PoxManager():
 def launch():
     "Start the OpenFlow manager and message receivers"
     ctrl = PoxManager()
+    core.registerNew(PoxManager)
     #mq = MsgQueueReceiver(Config.QueueId, ctrl)
     #ctrl.registerReceiver(mq)
     #rpc = RpcReceiver(Config.RpcHost, Config.RpcPort, ctrl)
     #ctrl.registerReceiver(rpc)
-    core.register("gavelcontroller", ctrl)
+    #core.register("gavelcontroller", ctrl)

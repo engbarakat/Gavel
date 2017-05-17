@@ -1,14 +1,15 @@
+from OFfactory import *
 
 def installpath(**kwargs):#switches = pathins["pa.switches"],portsforward = pathins["pa.ports"],portsbackward = None , src = srcIP, dst =dstIP
 	for switch, fport,bport in zip(kwargs['switches'],kwargs['portsforward'],kwargs['portsbackward']):
 		print "install path now in {0}, with fport {1}, and backport {2}".format(switch,fport,bport)
-		installpathofmsg(switch,fport,bport,kwargs['src'],kwargs['dst']) 
+		installpathofmsg(switch,fport,bport,kwargs['srcip'],kwargs['dstip'],kwargs['srcmac'],kwargs['dstmac']) 
 	
 
 def deletepath(**kwargs):
 	for switch, fport,bport in zip(kwargs['switches'],kwargs['portsforward'],kwargs['portsbackward']):
 		print "install path now in {0}, with fport {1}, and backport {2}".format(switch,fport,bport)
-		deletepathofmsg(switch,fport,bport,kwargs['src'],kwargs['dst'])
+		deletepathofmsg(switch,fport,bport,kwargs['srcip'],kwargs['dstip'],kwargs['srcmac'],kwargs['dstmac'])
 
 def blockhost(**kwargs):
 	for switch in kwargs['switch']:

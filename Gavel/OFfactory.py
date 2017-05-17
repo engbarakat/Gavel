@@ -1,5 +1,8 @@
 from mininet.net import macColonHex, netParse, ipAdd
-
+import os
+import sys
+import subprocess
+from updateGavel import getswtichname
 
 OFPC_FLOW_STATS = 1
 OFPC_TABLE_STATS = 2
@@ -21,6 +24,12 @@ OFPP_CONTROLLER = 65533
 OFPP_LOCAL = 65534
 OFPP_NONE = 65535
 
+
+class Switch ():
+    def __init__(self,dpid):
+        self.dpid = dpid
+        self.name = getswtichname(dpid)
+        
 class Match(object):
     "A match object for an OpenFlow flow modification message"
 
@@ -59,7 +68,7 @@ class OfMessage():#from ravel
            actions: a list of ports to forward matching packets"""
         self.command = command
         self.priority = priority
-        self.switch = switch
+        self.switch = Switch(switch)
         self.match = match
         self.actions = actions
         if actions is None:
@@ -112,6 +121,7 @@ class OvsSender():#from ravel
             return
 
         subcmd = OvsSender.subcmds[msg.command]
+        
 
         # TODO: this is different for remote switches (ie, on physical network)
         dest = msg.switch.name
@@ -173,7 +183,7 @@ def _send_msg(command,  sw, src_ip, src_mac, dst_ip, dst_mac, outport, revoutpor
     conn.send(msg2)
     conn.send(arp1)
     conn.send(arp2)
-    conn.send(BarrierMessage(sw.dpid))
+    conn.send(BarrierMessage(sw))
 
 def installpathofmsg(dpid,fport,bport,srcIP,dstIP,srcMAC,dstMAC):
     _send_msg(OFPFC_ADD, dpid, srcIP, srcMAC, dstIP, dstMAC, fport, bport)

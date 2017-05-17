@@ -21,19 +21,19 @@ def getnextswitchid():
     listofsidint = [d.split('_')[0] for d in listofallsidstring]
     return str(max(listofsidint)+1)+"_1_9" #9 for manual insertion  
     
-def addswitchGavel(dpid):
+def addswitchGavel(dpid,name):
     #ID here has to be stoped and entered manually using the same dpid for future fix""""
     driver = GraphDatabase.driver("bolt://localhost", auth=basic_auth("neo4j", "gavel"))
     session = driver.session()
     #id = getnextswitchid() 
-    result = session.run("Merge (s:Switch {dpid: {switchdpid}}) on create set s.id = {switchdpid};",{"switchdpid":dpid})
+    result = session.run("Merge (s:Switch {dpid: {switchdpid}}) on create set s.id = {switchdpid}, s.name = {switchname};",{"switchdpid":dpid,"switchname":name})
     
 
 
 def delswitchGavel(dpid):
     driver = GraphDatabase.driver("bolt://localhost", auth=basic_auth("neo4j", "gavel"))
     session = driver.session()
-    result = session.run("Detach delete (n: Switch {dpid:{switchdpid}})",{"switchdpid":dpid})
+    result = session.run("match (n: Switch {dpid:{switchdpid}}) Detach delete n;",{"switchdpid":dpid})
     
 
 
@@ -62,13 +62,8 @@ def addhostGavel(macaddr,ipaddr,dpid,switchport):
     driver = GraphDatabase.driver("bolt://localhost", auth=basic_auth("neo4j", "gavel"))
     session = driver.session()
     result = session.run("Merge (s:Host {mac: {switchdpid}}) on create set s.id = {switchdpid}, s.ip={hostip};",{"switchdpid":macaddr,"hostip":ipaddr})
-    result = session.run( ''' MATCH (s2:Switch {dpid: {switchdpid2}})
-                              MATCH (h1:Host {ip: {hostip1}})
-                              MERGE (h1)-[r:Connected_to]->(s2)
-                              ON CREATE SET r.port1 = -1, r.port2 = {rowport2}, r.node1 = {hostip1}, r.node2={switchdpid2},r.cost = {rowport2}
-                              MERGE (s2)-[re:Connected_to]->(h1)
-                              ON CREATE SET re.port1 = {rowport2}, re.port2 = -1, re.node1 = {switchdpid2}, re.node2={hostip1},re.cost = {rowport2};
-                              ''',{"rowport2":port2,"hostip1":ipaddr,"switchdpid2":dpid2})
+    addlinkhostGavel(ipaddr,dpid,switchport)
+    
 
 def deletehostGavel(macaddr):
     """
@@ -76,10 +71,18 @@ def deletehostGavel(macaddr):
     """
     driver = GraphDatabase.driver("bolt://localhost", auth=basic_auth("neo4j", "gavel"))
     session = driver.session()
-    result = session.run("Detach delete (n: Host {mac:{switchdpid}})",{"switchdpid":macaddr})
+    result = session.run("match (n: Host {mac:{switchdpid}}) Detach delete n;",{"switchdpid":macaddr})
 
-def addlinkhostGavel():
-    pass
+def addlinkhostGavel(ipaddr,dpid,switchport):
+    driver = GraphDatabase.driver("bolt://localhost", auth=basic_auth("neo4j", "gavel"))
+    session = driver.session()
+    hport = -1
+    result = session.run( '''MATCH (s:Switch {dpid: {switchdpid2}}) MATCH (h:Host {ip: {hostip1}}) MERGE (h)-[r:Connected_to]->(s)
+ON CREATE SET r.port1 = toInt( {rowport1}), r.port2 =toInt( {rowport2}), r.node1 = {hostip1}, r.node2={switchdpid2},r.cost = toInt({rowport2})
+MERGE (s)-[re:Connected_to]->(h)
+ON CREATE SET re.port1 = toInt({rowport2}), re.port2 = toInt( {rowport1}), re.node1 = {switchdpid2}, re.node2={hostip1},re.cost = toInt({rowport2});
+                              ''',{"rowport2":switchport,"hostip1":ipaddr,"switchdpid2":dpid,"rowport1":hport})
+    
 
 def loaddb(topologyname = None):
     #load gavel database topology
@@ -89,3 +92,10 @@ def loaddb(topologyname = None):
         os.system("neo4j-shell -file clear.cypher -host localhost -v")
         return True
     os.system("neo4j-shell -file new_gdb%s.cypher -host localhost -v" %topologyname)
+
+def getswtichname(dpid):
+    driver = GraphDatabase.driver("bolt://localhost", auth=basic_auth("neo4j", "gavel"))
+    session = driver.session()
+    result = session.run('''MATCH (s:Switch {dpid: {switchdpid1}}) return s.name as name''',{"switchdpid1":dpid})
+    for n in result:
+        return n["name"]
