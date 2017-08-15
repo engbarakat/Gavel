@@ -83,7 +83,7 @@ def runthetest(topologyname,itera,listofpath):
                     endtime = timeit.default_timer()*1000
                     if len(result) > 0:
                         path = Path(key,v,endtime-starttime,slicesize)
-                        avgroutinglist[slicesize].append()#how to append to multidimention array
+                        avgroutinglist[slicesize].append(endtime-starttime)#how to append to multidimention array
                         listofpath.append(path)
         else:
             routinginnormal topology    
