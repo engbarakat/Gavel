@@ -12,6 +12,7 @@ class Path:
         self.host2 = host2
         self.getpath = getpath
         self.slicesize = size
+        
 
 class Slice:
     def __init__(self,hosts,switches,name):
@@ -34,6 +35,7 @@ def createslice(size,allhosts,allswitches):
         switchestobeadded.append(h)
     
     Createslicegavel(session,switchestobeadded, hoststobeadded,str(size))
+    print ("** The slice No. {2} with {0} hosts and {1} switch was created\n").format(len(hoststobeadded),len(switchestobeadded),size)
     return Slice(hoststobeadded,switchestobeadded,str(size))
     
 def selecthostsfromslice(slice):
@@ -59,7 +61,7 @@ def runthetest(topologyname,itera,listofpath):
     listofslices = []
     allhosts = []
     allswitches = []
-    
+    avgroutinglist = [][]
     result = session.run('''Match (h:Host) return h.ip AS ip ''')
     for host in result:
         allhosts.append(host["ip"])
@@ -69,52 +71,56 @@ def runthetest(topologyname,itera,listofpath):
         allswitches.append(host["dpid"])
     
     for slicesize in range(21):
-        listofslices.append( createslice(slicesize,allhosts,allswitches))
-        clearallinstalledpath(session)
-        for slice in listofslices:
-            hostlistinslice =  selecthostsfromslice(slice)#hostlist should be ready for routing function process
-            for h1,h2 in hostlistinslice.iteritems():
-                starttime = timeit.default_timer()*1000
-                result = Routeinslice(session, h1,h2,slice.name)
-                endtime = timeit.default_timer()*1000
-                if len(result) > 0:
-                    path = Path(key,v,endtime-starttime,slicesize)
-                    listofpath.append(path)
+        if slicesize>0:
+            listofslices.append( createslice(slicesize,allhosts,allswitches))
+            clearallinstalledpath(session)
+            for slice in listofslices:
+                hostlistinslice =  selecthostsfromslice(slice)#hostlist should be ready for routing function process
+                
+                for h1,h2 in hostlistinslice.iteritems():
+                    starttime = timeit.default_timer()*1000
+                    result = Routeinslice(session, h1,h2,slice.name)
+                    endtime = timeit.default_timer()*1000
+                    if len(result) > 0:
+                        path = Path(key,v,endtime-starttime,slicesize)
+                        avgroutinglist[slicesize].append()#how to append to multidimention array
+                        listofpath.append(path)
+        else:
+            routinginnormal topology    
     
     
     
-    
-    hostlistready = {}
-    listoftimea = []
-    listoftimeb = []
-    switchlist= ["0000000000001701","0000000000001d01","0000000000001c01","0000000000001b01","0000000000001601","0000000000001a01"]
-    hostlist= ["10.3.29.30","10.3.26.27"]
-    result = session.run('''Match (h:Switch) return h.dpid AS dpid ''')
-    resultlistnotrandom = list(result)
-    for x in random.sample(resultlistnotrandom,38):
-        switchlist.append(x["dpid"]) 
-     
-     
-    result = session.run('''Match (h:Host) return h.ip AS ip ''')
-    resultlistnotrandom = list(result)
-    for h in random.sample(resultlistnotrandom,10):
-        hostlist.append(h["ip"]) 
-#     print switchlist,hostlist
-    Createslice(session,switchlist, hostlist,"Osamah")
-    #print resultlist
-    #resultlist = list(result)
-
-    for n in xrange(0,len(hostlist), 2):
-        hostlistready[hostlist[n]] = hostlist[n+1]
-
-    for key,v in hostlistready.iteritems():
-        #print key, v
-        astartt = timeit.default_timer() *1000
-        Routeinslice(session,key,v,"slice")
-        aendt = timeit.default_timer() *1000
-        path = Path(key,v,aendt-astartt,0)
-        listofpath.append(path)
-        ########################################################################################################
+#     hostlistready = {}
+#     listoftimea = []
+#     listoftimeb = []
+#     switchlist= ["0000000000001701","0000000000001d01","0000000000001c01","0000000000001b01","0000000000001601","0000000000001a01"]
+#     hostlist= ["10.3.29.30","10.3.26.27"]
+#     result = session.run('''Match (h:Switch) return h.dpid AS dpid ''')
+#     resultlistnotrandom = list(result)
+#     for x in random.sample(resultlistnotrandom,38):
+#         switchlist.append(x["dpid"]) 
+#      
+#      
+#     result = session.run('''Match (h:Host) return h.ip AS ip ''')
+#     resultlistnotrandom = list(result)
+#     for h in random.sample(resultlistnotrandom,10):
+#         hostlist.append(h["ip"]) 
+# #     print switchlist,hostlist
+#     Createslice(session,switchlist, hostlist,"Osamah")
+#     #print resultlist
+#     #resultlist = list(result)
+# 
+#     for n in xrange(0,len(hostlist), 2):
+#         hostlistready[hostlist[n]] = hostlist[n+1]
+# 
+#     for key,v in hostlistready.iteritems():
+#         #print key, v
+#         astartt = timeit.default_timer() *1000
+#         Routeinslice(session,key,v,"slice")
+#         aendt = timeit.default_timer() *1000
+#         path = Path(key,v,aendt-astartt,0)
+#         listofpath.append(path)
+#         ########################################################################################################
 
 def writeresults(sizeoffattree,listofpath):    
     fo = open("JournalGavel%sslice.txt" %sizeoffattree, "wb")
