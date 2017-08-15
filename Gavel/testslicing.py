@@ -33,7 +33,7 @@ def createslice(size,allhosts,allswitches):
     for h in random.sample(allswitches,random.sample(switchnumerpossible,1)):
         switchestobeadded.append(h)
     
-    Createslice(session,switchestobeadded, hoststobeadded,str(size))
+    Createslicegavel(session,switchestobeadded, hoststobeadded,str(size))
     return Slice(hoststobeadded,switchestobeadded,str(size))
     
 def selecthostsfromslice(slice):
@@ -41,8 +41,11 @@ def selecthostsfromslice(slice):
     for n in xrange(0,len(slice.hosts), 2):
         hostsinslice[hosts[n]] = hosts[n+1]
         return hostsinslice
+
 def clearallinstalledpaths(session):
-    pass    
+    session.run('''match ()-[r:PathSlice_to]-() delete r''')
+    session.run('''match ()-[r:Path]-() delete r''')
+        
 
 def loadftgdb(sizeoffattree):
     print ">>>>>>>neo4j-shell -file new_gdb%s.cypher -host localhost -v" %sizeoffattree
@@ -72,10 +75,11 @@ def runthetest(topologyname,itera,listofpath):
             hostlistinslice =  selecthostsfromslice(slice)#hostlist should be ready for routing function process
             for h1,h2 in hostlistinslice.iteritems():
                 starttime = timeit.default_timer()*1000
-                Routeinslice(session, h1,h2,slice.name)
+                result = Routeinslice(session, h1,h2,slice.name)
                 endtime = timeit.default_timer()*1000
-                path = Path(key,v,endtime-starttime,slicesize)
-                listofpath.append(path)
+                if len(result) > 0:
+                    path = Path(key,v,endtime-starttime,slicesize)
+                    listofpath.append(path)
     
     
     

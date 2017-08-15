@@ -3,7 +3,7 @@ from neo4j.v1 import GraphDatabase, basic_auth
 
 
 
-def Createslice(session,listofswitches, listofhosts,slice):
+def Createslicegavel(session,listofswitches, listofhosts,slice):
     """Create a network slice"""
     #driver = GraphDatabase.driver("bolt://localhost", auth=basic_auth("neo4j", "gavel"))
     #session = driver.session()
@@ -36,4 +36,4 @@ def Routeinslice(session,src,dst,slice):
                             with h1,h2,l,p order by length(p) Limit 1 
                             create (h1)-[pa:PathSlice_to{switches:[n in nodes(p)[1..-1]| n.dpid], fports:[r in rels(p)[1..]| r.port1],bports:[r in rels(p)[..-1]| r.port2]}]->(h2) 
                             return pa.switches, pa.fports, pa.bports, h1.mac, h2.mac;''',{"slicename":slice,"srcip":src,"dstip":dst})
-    
+    return result
