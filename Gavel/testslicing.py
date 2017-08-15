@@ -4,24 +4,79 @@ import random
 import itertools
 import os
 from slicermanager import *
+from __main__ import name
 
 class Path:
-    def __init__(self,host1, host2, getpath, writepath):
+    def __init__(self,host1, host2, getpath, size):
         self.host1 = host1
         self.host2 = host2
         self.getpath = getpath
-        self.writepath = writepath
+        self.slicesize = size
 
+class Slice:
+    def __init__(self,hosts,switches,name):
+        self.hosts = hosts
+        self.switches = switches
+        self.name = name
+        
+    
+    
+def createslice(size,allhosts,allswitches):
+    hostsnumberpossible = xrange(1,len(allhosts), 2)
+    switchnumerpossible = xrange(1,len(allswitches), 2)
+    
+    hoststobeadded = []
+    switchestobeadded = []
+    
+    for h in random.sample(allhosts,random.sample(hostsnumberpossible,1)):
+        hoststobeadded.append(h)
+    for h in random.sample(allswitches,random.sample(switchnumerpossible,1)):
+        switchestobeadded.append(h)
+    
+    Createslice(session,switchestobeadded, hoststobeadded,str(size))
+    return Slice(hoststobeadded,switchestobeadded,str(size))
+    
+def selecthostsfromslice(slice):
+    hostsinslice = []
+    for n in xrange(0,len(slice.hosts), 2):
+        hostsinslice[hosts[n]] = hosts[n+1]
+        return hostsinslice
+def clearallinstalledpaths(session):
+    pass    
 
 def loadftgdb(sizeoffattree):
     print ">>>>>>>neo4j-shell -file new_gdb%s.cypher -host localhost -v" %sizeoffattree
     os.system("neo4j-shell -file new_gdb%s.cypher -host localhost -v" %sizeoffattree)
 
-def runthetest(sizeoffattree,itera,listofpath):
-    print ">>>>>>>start the test with size of %s for the time No.%d" %(sizeoffattree,itera)
+def runthetest(topologyname,itera,listofpath):
+    print ">>>>>>>start the test with size of %s for the time No.%d" %(topologyname,itera)
     driver = GraphDatabase.driver("bolt://localhost", auth=basic_auth("neo4j", "gavel"))
     session = driver.session()
     session.run('''match (n)-[r]-() return count(n)''')
+    listofslices = []
+    allhosts = []
+    allswitches = []
+    
+    result = session.run('''Match (h:Host) return h.ip AS ip ''')
+    for host in result:
+        allhosts.append(host["ip"])
+    
+    result = session.run('''Match (s:Switch) return s.dpid AS dpid ''')
+    for host in result:
+        allswitches.append(host["dpid"])
+    
+    for slicesize in range(21):
+        listofslices.append( createslice(slicesize,allhosts,allswitches))
+        clearallinstalledpath(session)
+        for slice in listofslices:
+            hostlistinslice =  selecthostsfromslice(slice)#hostlist should be ready for routing function process
+            for h1,h2 in hostlistinslice.iteritems():
+                starttime = timeit.default_timer()*1000
+                Routeinslice(session, h1,h2,slice.name)
+                endtime = timeit.default_timer()*1000
+                path = Path(key,v,endtime-starttime,slicesize)
+                listofpath.append(path)
+    
     
     
     
@@ -53,12 +108,6 @@ def runthetest(sizeoffattree,itera,listofpath):
         astartt = timeit.default_timer() *1000
         Routeinslice(session,key,v,"slice")
         aendt = timeit.default_timer() *1000
-        
-#        bstartt = timeit.default_timer() *1000
-#        for path in result:
-#            #print path['switch'], path['port']
-#            result = session.run('''Create (p1:Path{from:{firstip}, to:{secondip}, switches:{nodelist}, ports:{relslist}});''',{"firstip": key, "secondip": v, "nodelist":path['switch'],"relslist":path["port"]} )
-#        bendt = timeit.default_timer() *1000
         path = Path(key,v,aendt-astartt,0)
         listofpath.append(path)
         ########################################################################################################
