@@ -36,4 +36,7 @@ def Routeinslice(session,src,dst,slice):
                             with h1,h2,l,p order by length(p) Limit 1 
                             create (h1)-[pa:PathSlice_to{switches:[n in nodes(p)[1..-1]| n.dpid], fports:[r in rels(p)[1..]| r.port1],bports:[r in rels(p)[..-1]| r.port2]}]->(h2) 
                             return pa.switches, pa.fports, pa.bports, h1.mac, h2.mac;''',{"slicename":slice,"srcip":src,"dstip":dst})
-    return result
+    for pathins in result:
+        #msgOF("installflow",switches = pathins["pa.switches"],portsforward = pathins["pa.fports"],portsbackward = pathins["pa.bports"] , srcip = srcIP, dstip =dstIP,srcmac=pathins["h1.mac"],dstmac= pathins["h1.mac"])
+        return True
+    return False

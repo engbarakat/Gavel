@@ -4,7 +4,7 @@ import random
 import itertools
 import os
 from slicermanager import *
-from __main__ import name
+from route import *
 
 class Path:
     def __init__(self,host1, host2, getpath, size):
@@ -22,27 +22,38 @@ class Slice:
         
     
     
-def createslice(size,allhosts,allswitches):
-    hostsnumberpossible = xrange(1,len(allhosts), 2)
-    switchnumerpossible = xrange(1,len(allswitches), 2)
+def createslice(session,size,allhosts,allswitches):
+    hostsnumberpossible = [n for n in xrange(2,len(allhosts), 2)]
+    switchnumerpossible = [n for n in range(1,len(allswitches))]
     
     hoststobeadded = []
     switchestobeadded = []
     
-    for h in random.sample(allhosts,random.sample(hostsnumberpossible,1)):
+    for h in random.sample(allhosts,random.sample(hostsnumberpossible,1)[0]):
         hoststobeadded.append(h)
-    for h in random.sample(allswitches,random.sample(switchnumerpossible,1)):
+    
+    switchnumerpossible = [n for n in range(5,len(allswitches))]
+    
+    for h in random.sample(allswitches,random.sample(switchnumerpossible,1)[0]):
         switchestobeadded.append(h)
     
     Createslicegavel(session,switchestobeadded, hoststobeadded,str(size))
     print ("** The slice No. {2} with {0} hosts and {1} switch was created\n").format(len(hoststobeadded),len(switchestobeadded),size)
     return Slice(hoststobeadded,switchestobeadded,str(size))
     
-def selecthostsfromslice(slice):
-    hostsinslice = []
+def createslicemodified(session,size,allhosts,allswitches):
+    Createslicegavel(session,allswitches, allhosts,str(size))
+    print ("** The slice No. {2} with {0} hosts and {1} switch was created\n").format(len(allhosts),len(allswitches),size)
+    return Slice(allhosts,allswitches,str(size))
+
+def deleteallslices(session):
+    session.run('''match (n:Slice) detach delete n''')
+
+def gethostsfromslice(slice):
+    hostsinslice = {}
     for n in xrange(0,len(slice.hosts), 2):
-        hostsinslice[hosts[n]] = hosts[n+1]
-        return hostsinslice
+        hostsinslice[slice.hosts[n]] = slice.hosts[n+1]
+    return hostsinslice
 
 def clearallinstalledpaths(session):
     session.run('''match ()-[r:PathSlice_to]-() delete r''')
@@ -61,34 +72,78 @@ def runthetest(topologyname,itera,listofpath):
     listofslices = []
     allhosts = []
     allswitches = []
-    avgroutinglist = [][]
+    avgroutingdict = {}
+    avgroutinglistperslice=[]
+    hoststoroute= []
+    listofzerocounted = []
+    
     result = session.run('''Match (h:Host) return h.ip AS ip ''')
     for host in result:
         allhosts.append(host["ip"])
     
+    print ("Total hosts fetched are {0}").format(len(allhosts))
     result = session.run('''Match (s:Switch) return s.dpid AS dpid ''')
     for host in result:
         allswitches.append(host["dpid"])
+    print ("Total Switches fetched are {0}").format(len(allswitches))
+    print "Now we are running in slice No. 0 \n"
+    hostlistready = {}
+    hostsnumberpossiblezeroslice = [n for n in xrange(2, len(allhosts), 2)]
     
-    for slicesize in range(21):
+    for h in random.sample(allhosts, random.sample(hostsnumberpossiblezeroslice, 1)[0]):
+        hoststoroute.append(h)
+    print "For slice No. {0} the route test done between {1} hosts".format("0", len(hoststoroute))  
+    for n in xrange(0, len(hoststoroute), 2):
+        hostlistready[hoststoroute[n]] = hoststoroute[n + 1]
+ 
+    for key, v in hostlistready.iteritems():
+        astartt = timeit.default_timer() * 1000
+        if getroute(key, v, session):
+            aendt = timeit.default_timer() * 1000
+            avgroutinglistperslice.append(aendt - astartt)
+            path = Path(key, v, aendt - astartt, 0)
+            listofpath.append(path)
+    if len(avgroutinglistperslice) > 0:
+        avgroutingdict[0] = sum(avgroutinglistperslice) / float(len(avgroutinglistperslice))
+    else:
+        avgroutingdict[0] = 0
+    zeroinlist = {0:len(avgroutinglistperslice)}
+    listofzerocounted.append(zeroinlist.copy())
+    #print len(avgroutinglistperslice)
+    del avgroutinglistperslice[:]
+    
+    for slicesize in range(10):
+        clearallinstalledpaths(session)
         if slicesize>0:
-            listofslices.append( createslice(slicesize,allhosts,allswitches))
-            clearallinstalledpath(session)
+            #delete all existing slices
+            #deleteallslices(session)
+            listofslices.append( createslice(session, slicesize,hoststoroute,allswitches))
+            
             for slice in listofslices:
-                hostlistinslice =  selecthostsfromslice(slice)#hostlist should be ready for routing function process
-                
+                hostlistinslice =  gethostsfromslice(slice)#hostlist should be ready for routing function process
+                print "Testing routing with   {0} slices  between {1} hosts".format(slicesize, len(slice.hosts))
                 for h1,h2 in hostlistinslice.iteritems():
+                    
                     starttime = timeit.default_timer()*1000
                     result = Routeinslice(session, h1,h2,slice.name)
                     endtime = timeit.default_timer()*1000
-                    if len(result) > 0:
+                    if result:
                         path = Path(key,v,endtime-starttime,slicesize)
-                        avgroutinglist[slicesize].append(endtime-starttime)#how to append to multidimention array
+                        avgroutinglistperslice.append(endtime-starttime)#how to append to multidimention array
                         listofpath.append(path)
-        else:
-            routinginnormal topology    
-    
-    
+            if len(avgroutinglistperslice)>0:
+                avgroutingdict[int(slice.name)] = sum(avgroutinglistperslice) / float(len(avgroutinglistperslice))
+            else:
+                avgroutingdict[int(slice.name)] = 0
+            zeroinlist = {slicesize:len(avgroutinglistperslice)}
+            listofzerocounted.append(zeroinlist.copy())
+            #print len(avgroutinglistperslice)
+            del avgroutinglistperslice[:]
+        #routing without slice
+            
+    print listofzerocounted
+    for k,v in avgroutingdict.iteritems():
+        print k,v
     
 #     hostlistready = {}
 #     listoftimea = []
@@ -135,7 +190,7 @@ listofpadth=[]
 #NFtwo = NetworkFunction(200,[('0000000000001b01',11),('0000000000001901',9),('0000000000002601',6)])
 #NFthree = NetworkFunction(300,[('0000000000000e01',12),('0000000000001601',6),('0000000000001001',10)])
  
-for s in ['Geant2012']:
+for s in ['16']:
     listofpath=[]
     loadftgdb(s)
     for i in range(1):

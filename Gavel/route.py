@@ -17,7 +17,7 @@ def getroute(srcIP, dstIP,session = None):
 	# return to the user
 	if session is None:
 		driver = GraphDatabase.driver("bolt://localhost", auth=basic_auth("neo4j", "gavel"))
-    	session = driver.session()
+		session = driver.session()
 	resultroute = session.run('''Match (Host{ip:{firstip}}) -[r]-(Host{ip:{secondip}}) return distinct type(r)''',{"firstip": srcIP, "secondip": dstIP} )
 	for relationship in resultroute:
 		print  relationship["type(r)"]
@@ -31,7 +31,7 @@ def getroute(srcIP, dstIP,session = None):
 							create (h1)-[pa:Path_to{switches:[n in nodes(p)[1..-1]| n.dpid], fports:[r in rels(p)[1..]| r.port1],bports:[r in rels(p)[..-1]| r.port2]}]->(h2) 
 							return pa.switches, pa.fports, pa.bports, h1.mac, h2.mac;''',{"firstip": srcIP, "secondip": dstIP} )
 	for pathins in result:
-		msgOF("installflow",switches = pathins["pa.switches"],portsforward = pathins["pa.fports"],portsbackward = pathins["pa.bports"] , srcip = srcIP, dstip =dstIP,srcmac=pathins["h1.mac"],dstmac= pathins["h1.mac"])
+		#msgOF("installflow",switches = pathins["pa.switches"],portsforward = pathins["pa.fports"],portsbackward = pathins["pa.bports"] , srcip = srcIP, dstip =dstIP,srcmac=pathins["h1.mac"],dstmac= pathins["h1.mac"])
 		return True
 	return False
 
