@@ -31,7 +31,7 @@ def installMBs(session, Switches, numberofMBs):
 		NoofHosts =random.randint(2,3)
 		#print NoofHosts
 		switchlist =  random.sample(Switches,NoofHosts)
-		session.run('''Match (m:MiddleBox{dpid: {MBdpid}}) Match (s:Switch) where s.dpid in {slist} 
+		session.run('''Match (m:MiddelBox{dpid: {MBdpid}}) Match (s:Switch) where s.dpid in {slist} 
 		MERGE (m)-[r:Hosts]-(s) ON CREATE SET r.cost= {scostmb};''',{"MBdpid":"mb30"+str(x),"slist":switchlist,"scostmb":random.randint(2,9)})
 		listofMBs.append(NetworkFunction("mb30"+str(x),switchlist))
 	return listofMBs
@@ -85,7 +85,7 @@ def runthetest(sizeoffattree,itera,listofpath):
 		########################################################################################################
 
 	
-	session.close()
+	
 
 def writeresults(sizeoffattree,listofpath):	
 	fo = open("JournalGavel%sSFC.txt" %sizeoffattree, "wb")
@@ -105,6 +105,6 @@ for s in ['Geant2012']:
 	loadftgdb(s)
 	for i in range(1):
 		runthetest(s,i,listofpath)
-	writeresults(s,listofpath)
+	#writeresults(s,listofpath)
 	#writeresultsPats(s,listofpath)
 	#plotresults(s)
