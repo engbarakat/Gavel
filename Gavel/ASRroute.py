@@ -32,30 +32,32 @@ def getsubroute(session, src,srctype, dst,dsttype):
 	#print"getting shortest path between " + src +" and "+  dst
 	#To Do : check if src and dst are the same thing then return only hte cost of processing.
 	#implement cost of processing also.
-	
-	if (srctype == 0):
-		#print"getting shortest path between " + src +" and "+  dst
-		#src is host
-		result = session.run('''MATCH (h1:Host {ip:{firstip}}), (h2:Switch {dpid:{secondip}}) Match p=allshortestPaths((h1)-[:Connected_to*]->(h2)) return 
-		reduce(cost=0, r in relationships(p) |  cost+r.cost) AS cost ,[n in nodes(p)[1..]| n.dpid] as switches, 
-		[r in relationships(p)[1..]| r.port1] as ports , h2.dpid as node order by cost ASC limit 1;''',{"firstip": src, "secondip": dst} )
-		for pathins in result:
-			return Subpath(pathins["switches"],pathins["ports"],pathins["cost"],pathins["node"])
-	elif (dsttype == 0):
-		#print"getting shortest path between " + src +" and "+  dst
-		#dst is host
-		result = session.run('''MATCH (h1:Switch {dpid:{firstip}}), (h2:Host {ip:{secondip}}) Match p=allshortestPaths((h1)-[:Connected_to*]->(h2)) return 
-		reduce(cost=0, r in relationships(p) |  cost+r.cost) AS cost ,[n in nodes(p)[1..-1]| n.dpid] as switches, 
-		[r in relationships(p)[0..]| r.port1] as ports, h2.ip as node  order by cost ASC limit 1;''',{"firstip": src, "secondip": dst} )
-		for pathins in result:
-			return Subpath(pathins["switches"],pathins["ports"],pathins["cost"],pathins["node"])
+	if src == dst :
+		pass
 	else:
-		#print"getting shortest path between " + src +" and "+  dst
-		#src and dst are nodes
-		result = session.run('''MATCH (h1:Switch {dpid:{firstip}}), (h2:Switch {dpid:{secondip}}) Match p=allshortestPaths((h1)-[:Connected_to*]->(h2)) return 	reduce(cost=0, r in relationships(p) |  cost+r.cost) AS cost ,
-		[n in nodes(p)[1..]| n.dpid] as switches, [r in relationships(p)[0..]| r.port1] as ports, h2.dpid as node order by cost ASC limit 1;''',{"firstip": str(src), "secondip": str(dst)} )
-		for pathins in result:
-			return Subpath(pathins["switches"],pathins["ports"],pathins["cost"],pathins["node"])
+		if (srctype == 0):
+			#print"getting shortest path between " + src +" and "+  dst
+			#src is host
+			result = session.run('''MATCH (h1:Host {ip:{firstip}}), (h2:Switch {dpid:{secondip}}) Match p=allshortestPaths((h1)-[:Connected_to*]->(h2)) return 
+			reduce(cost=0, r in relationships(p) |  cost+r.cost) AS cost ,[n in nodes(p)[1..]| n.dpid] as switches, 
+			[r in relationships(p)[1..]| r.port1] as ports , h2.dpid as node order by cost ASC limit 1;''',{"firstip": src, "secondip": dst} )
+			for pathins in result:
+				return Subpath(pathins["switches"],pathins["ports"],pathins["cost"],pathins["node"])
+		elif (dsttype == 0):
+			#print"getting shortest path between " + src +" and "+  dst
+			#dst is host
+			result = session.run('''MATCH (h1:Switch {dpid:{firstip}}), (h2:Host {ip:{secondip}}) Match p=allshortestPaths((h1)-[:Connected_to*]->(h2)) return 
+			reduce(cost=0, r in relationships(p) |  cost+r.cost) AS cost ,[n in nodes(p)[1..-1]| n.dpid] as switches, 
+			[r in relationships(p)[0..]| r.port1] as ports, h2.ip as node  order by cost ASC limit 1;''',{"firstip": src, "secondip": dst} )
+			for pathins in result:
+				return Subpath(pathins["switches"],pathins["ports"],pathins["cost"],pathins["node"])
+		else:
+			#print"getting shortest path between " + src +" and "+  dst
+			#src and dst are nodes
+			result = session.run('''MATCH (h1:Switch {dpid:{firstip}}), (h2:Switch {dpid:{secondip}}) Match p=allshortestPaths((h1)-[:Connected_to*]->(h2)) return 	reduce(cost=0, r in relationships(p) |  cost+r.cost) AS cost ,
+			[n in nodes(p)[1..]| n.dpid] as switches, [r in relationships(p)[0..]| r.port1] as ports, h2.dpid as node order by cost ASC limit 1;''',{"firstip": str(src), "secondip": str(dst)} )
+			for pathins in result:
+				return Subpath(pathins["switches"],pathins["ports"],pathins["cost"],pathins["node"])
 	
 def getallhostingSwitches(session,listofFun):
 	for fn in listofFun:

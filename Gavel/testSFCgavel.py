@@ -36,7 +36,10 @@ def installMBs(session, Switches, numberofMBs):
 		listofMBs.append(NetworkFunction("mb30"+str(x),switchlist))
 	return listofMBs
 
-def runthetest(sizeoffattree,itera,listofpath):
+def clearallMBs(session):
+	session.run('''Match (m:MiddelBox) detach delete m;''')
+def runthetest(sizeoffattree,itera,listofpathforallMBs):
+	listofpath = []
 	print ">>>>>>>start the test with size of %s for the time No.%d" %(sizeoffattree,itera)
 	driver = GraphDatabase.driver("bolt://localhost", auth=basic_auth("neo4j", "gavel"))
 	session = driver.session()
@@ -58,30 +61,34 @@ def runthetest(sizeoffattree,itera,listofpath):
 	NFtwo = NetworkFunction(200,[resultlist[7]["dpid"],resultlist[2]["dpid"],resultlist[1]["dpid"]])
 	NFthree = NetworkFunction(300,[resultlist[8]["dpid"],resultlist[6]["dpid"],resultlist[5]["dpid"]])'''
 	numberofMBs = 4
-	listofSFC = installMBs(session, switchlist, numberofMBs)
-	print listofSFC
-	result = session.run('''Match (h:Host) return h.ip AS ip ''')
-	resultlistnotrandom = list(result)
-	resultlist = random.sample(resultlistnotrandom,20)
+	for numberofMBs in range(3,5):
+		listofpath = []
+		clearallMBs(session)
+		listofSFC = installMBs(session, switchlist, numberofMBs)
+		print listofSFC
+		result = session.run('''Match (h:Host) return h.ip AS ip ''')
+		resultlistnotrandom = list(result)
+		resultlist = random.sample(resultlistnotrandom,20)
 	#print resultlist
 	#resultlist = list(result)
 
-	for n in xrange(0,len(resultlist), 2):
-		hostlistready[resultlist[n]["ip"]] = resultlist[n+1]["ip"]
+		for n in xrange(0,len(resultlist), 2):
+			hostlistready[resultlist[n]["ip"]] = resultlist[n+1]["ip"]
 
-	for key,v in hostlistready.iteritems():
+		for key,v in hostlistready.iteritems():
 		#print key, v
-		astartt = timeit.default_timer() *1000
-		asrroutecalculation(session, key,v,listofSFC)
-		aendt = timeit.default_timer() *1000
+			astartt = timeit.default_timer() *1000
+			asrroutecalculation(session, key,v,listofSFC)
+			aendt = timeit.default_timer() *1000
 		
 #		bstartt = timeit.default_timer() *1000
 #		for path in result:
 #			#print path['switch'], path['port']
 #			result = session.run('''Create (p1:Path{from:{firstip}, to:{secondip}, switches:{nodelist}, ports:{relslist}});''',{"firstip": key, "secondip": v, "nodelist":path['switch'],"relslist":path["port"]} )
 #		bendt = timeit.default_timer() *1000
-		path = Path(key,v,aendt-astartt,0)
-		listofpath.append(path)
+			path = Path(key,v,aendt-astartt,0)
+			listofpath.append(path)
+			listofpathforallMBs[numberofMBs]= listofpath
 		########################################################################################################
 
 	
@@ -89,8 +96,9 @@ def runthetest(sizeoffattree,itera,listofpath):
 
 def writeresults(sizeoffattree,listofpath):	
 	fo = open("JournalGavel%sSFC.txt" %sizeoffattree, "wb")
-	for a in listofpath:
-		fo.write(str(a.host1)+'\t'+str(a.host2) + '\t'+str(a.getpath)+'\t'+str(a.writepath) + '\n')
+	for mbnumber in listofpath:
+		for a in listofpath[mbnumber]:
+			fo.write(str(a.host1)+'\t'+str(a.host2) + '\t'+str(a.getpath)+'\t'+str(a.writepath) + '\t'+str(mbnumber)+ '\n')
 	fo.close()
 def plotresults(k):
 	os.system("gnuplot plotresults%d.gplt" %k)
@@ -101,10 +109,10 @@ listofpadth=[]
 #NFthree = NetworkFunction(300,[('0000000000000e01',12),('0000000000001601',6),('0000000000001001',10)])
  
 for s in ['Geant2012']:
-	listofpath=[]
+	listofpathforallMBs={}
 	loadftgdb(s)
 	for i in range(1):
-		runthetest(s,i,listofpath)
-	#writeresults(s,listofpath)
+		runthetest(s,i,listofpathforallMBs)
+	writeresults(s,listofpathforallMBs)
 	#writeresultsPats(s,listofpath)
 	#plotresults(s)
