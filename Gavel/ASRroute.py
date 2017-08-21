@@ -33,6 +33,7 @@ def getsubroute(session, src,srctype, dst,dsttype):
 	#To Do : check if src and dst are the same thing then return only hte cost of processing.
 	#implement cost of processing also.
 	if src == dst :
+		return Subpath(src,0,0,dst)
 		pass
 	else:
 		if (srctype == 0):
