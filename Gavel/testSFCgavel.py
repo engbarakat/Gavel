@@ -53,6 +53,7 @@ def runthetest(sizeoffattree,itera,listofpathforallMBs):
 	result = session.run('''Match (h:Switch) return h.dpid AS dpid ''')
 	resultlistnotrandom = list(result)
 	switchlist = []
+	resultlist = []
 	for s in resultlistnotrandom:
 		switchlist.append(s["dpid"])
 	#print switchlist
@@ -60,15 +61,18 @@ def runthetest(sizeoffattree,itera,listofpathforallMBs):
 	NFone = NetworkFunction(100,[resultlist[0]["dpid"],resultlist[4]["dpid"],resultlist[3]["dpid"]])
 	NFtwo = NetworkFunction(200,[resultlist[7]["dpid"],resultlist[2]["dpid"],resultlist[1]["dpid"]])
 	NFthree = NetworkFunction(300,[resultlist[8]["dpid"],resultlist[6]["dpid"],resultlist[5]["dpid"]])'''
-	numberofMBs = 4
-	for numberofMBs in range(3,5):
+	#numberofMBs = 4
+	for numberofMBs in range(3,8):
 		listofpath = []
 		clearallMBs(session)
 		listofSFC = installMBs(session, switchlist, numberofMBs)
 		print listofSFC
 		result = session.run('''Match (h:Host) return h.ip AS ip ''')
 		resultlistnotrandom = list(result)
-		resultlist = random.sample(resultlistnotrandom,20)
+		hostsnumberpossible = [n for n in xrange(2,len(resultlistnotrandom), 2)]
+		for h in random.sample(resultlistnotrandom,random.sample(hostsnumberpossible,1)[0]):
+			resultlist.append(h)
+		#resultlist = random.sample(resultlistnotrandom,20)
 	#print resultlist
 	#resultlist = list(result)
 
@@ -108,7 +112,7 @@ listofpadth=[]
 #NFtwo = NetworkFunction(200,[('0000000000001b01',11),('0000000000001901',9),('0000000000002601',6)])
 #NFthree = NetworkFunction(300,[('0000000000000e01',12),('0000000000001601',6),('0000000000001001',10)])
  
-for s in ['Geant2012']:
+for s in ['Geant2012','16','32','64']:
 	listofpathforallMBs={}
 	loadftgdb(s)
 	for i in range(1):
