@@ -121,7 +121,7 @@ def runthetest(topologyname,itera,listofpath):
             
             for slice in listofslices:
                 hostlistinslice =  gethostsfromslice(slice)#hostlist should be ready for routing function process
-                print "Testing routing with   {0} slices  between {1} hosts".format(slicesize, len(slice.hosts))
+                #print "Testing routing with   {0} slices  between {1} hosts".format(slicesize, len(slice.hosts))
                 for h1,h2 in hostlistinslice.iteritems():
                     
                     starttime = timeit.default_timer()*1000
@@ -141,9 +141,9 @@ def runthetest(topologyname,itera,listofpath):
             del avgroutinglistperslice[:]
         #routing without slice
             
-    print listofzerocounted
-    for k,v in avgroutingdict.iteritems():
-        print k,v
+    #print listofzerocounted
+    #for k,v in avgroutingdict.iteritems():
+       # print k,v
     
 #     hostlistready = {}
 #     listoftimea = []
@@ -180,7 +180,7 @@ def runthetest(topologyname,itera,listofpath):
 def writeresults(sizeoffattree,listofpath):    
     fo = open("JournalGavel%sslice.txt" %sizeoffattree, "wb")
     for a in listofpath:
-        fo.write(str(a.host1)+'\t'+str(a.host2) + '\t'+str(a.getpath)+'\t'+str(a.writepath) + '\n')
+        fo.write(str(a.host1)+'\t'+str(a.host2) + '\t'+str(a.getpath)+'\t'+str(a.slicesize) + '\n')
     fo.close()
 def plotresults(k):
     os.system("gnuplot plotresults%d.gplt" %k)
@@ -190,11 +190,11 @@ listofpadth=[]
 #NFtwo = NetworkFunction(200,[('0000000000001b01',11),('0000000000001901',9),('0000000000002601',6)])
 #NFthree = NetworkFunction(300,[('0000000000000e01',12),('0000000000001601',6),('0000000000001001',10)])
  
-for s in ['16']:
+for s in ['64']:
     listofpath=[]
     loadftgdb(s)
     for i in range(1):
         runthetest(s,i,listofpath)
-    #writeresults(s,listofpath)
+    writeresults(s,listofpath)
     #writeresultsPats(s,listofpath)
     #plotresults(s)
