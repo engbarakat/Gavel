@@ -102,7 +102,7 @@ def writeresults(sizeoffattree,listofpath):
 	fo = open("JournalGavel%sSFC.txt" %sizeoffattree, "wb")
 	for mbnumber in listofpath:
 		for a in listofpath[mbnumber]:
-			fo.write(str(a.host1)+'\t'+str(a.host2) + '\t'+str(a.getpath)+'\t'+str(a.writepath) + '\t'+str(mbnumber)+ '\n')
+			fo.write(str(a.host1)+'\t'+str(a.host2) + '\t'+str(a.getpath)+'\t'+str(a.writepath) +'\t'+str(mbnumber)+ '\n')
 	fo.close()
 def plotresults(k):
 	os.system("gnuplot plotresults%d.gplt" %k)

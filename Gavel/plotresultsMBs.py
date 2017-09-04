@@ -4,7 +4,7 @@ from matplotlib.patches import Polygon
 from pylab import plot, show, savefig, xlim, figure, hold, ylim, legend, boxplot, setp, axes
 
 
-plt.rcParams.update({'font.size': 40, 'legend.fontsize': 30,'font.color': '#77933C', 'xtick.major.pad':25,          'legend.linewidth': 2})
+#plt.rcParams.update({'font.size': 40, 'legend.fontsize': 30,'font.color': '#77933C', 'xtick.major.pad':25, 'legend.linewidth': 2})
 
 
 
@@ -52,23 +52,23 @@ g7=[]
 
 
 def setBoxColors(bp):
-    setp(bp['boxes'][0], color='green')
-    setp(bp['caps'][0], color='green')
-    setp(bp['caps'][1], color='green')
-    setp(bp['whiskers'][0], color='green')
-    setp(bp['whiskers'][1], color='green')
-    setp(bp['fliers'][0], color='green')
-    setp(bp['fliers'][1], color='green')
-    setp(bp['medians'][0], color='green')
+    setp(bp['boxes'][0], color='red')
+    setp(bp['caps'][0], color='red')
+    setp(bp['caps'][0], color='red')
+    setp(bp['whiskers'][0], color='red')
+    setp(bp['whiskers'][0], color='red')
+    setp(bp['fliers'][0], color='red')
+    setp(bp['fliers'][0], color='red')
+    setp(bp['medians'][0], color='red')
 
-    setp(bp['boxes'][1], color='violet')
-    setp(bp['caps'][2], color='violet')
-    setp(bp['caps'][3], color='violet')
-    setp(bp['whiskers'][2], color='violet')
-    setp(bp['whiskers'][3], color='violet')
-    setp(bp['fliers'][2], color='violet')
-    setp(bp['fliers'][3], color='violet')
-    setp(bp['medians'][1], color='violet')
+    setp(bp['boxes'][1], color='green')
+    setp(bp['caps'][1], color='green')
+    setp(bp['caps'][1], color='green')
+    setp(bp['whiskers'][1], color='green')
+    setp(bp['whiskers'][1], color='green')
+    setp(bp['fliers'][1], color='green')
+    setp(bp['fliers'][1], color='green')
+    setp(bp['medians'][1], color='green')
 
 def setBoxColorsspe(bp):
     setp(bp['boxes'][0], color='violet')
@@ -119,19 +119,21 @@ def is_outlier(points, thresh=2.5):
 
 with open('JournalGavel16SFC.txt') as inf:
     for line in inf:
-        parts = line.split("    ") # split line into parts
-        if parts[4] == 3:
+        parts = line.split("\t") # split line into parts
+        #print parts[4].rstrip()
+        if parts[4].rstrip() == '3':
+            #print '3333333333333333333333333333333'
             g3.append(float(parts[2]))
-        if parts[4] == 4:
+        elif parts[4].rstrip() == '4':
             g4.append(float(parts[2]))
-        if parts[4] == 5:
+        elif parts[4].rstrip() == '5':
             g5.append(float(parts[2]))
-        if parts[4] == 6:
+        elif parts[4].rstrip() == '6':
             g6.append(float(parts[2]))
-        if parts[4] == 7:
+        elif parts[4].rstrip() == '7':
             g7.append(float(parts[2]))
-            
-        
+
+
 # with open('Postergavelresults16all.txt') as inf:
 #     for line in inf:
 #         parts = line.split("    ") # split line into parts
@@ -176,7 +178,11 @@ with open('JournalGavel16SFC.txt') as inf:
 #         ubpT3G.append( float(parts[3]))
 #     
 
-
+r3 = g3
+r4=g4
+r5=g5
+r6=g6
+r7=g7
 
 
 
@@ -193,84 +199,105 @@ filteredg7 = g7[~is_outlier(g7)]
 
 
 
-A= [filteredbhT1G,filteredbhT1R]
-B=[filteredubhT1G,filteredubhT1R]
-C=[bpT1G,bpT1R]
-D=[ubpT1G,ubpT1R]
 
-bA= [filteredbhT2G,filteredbhT2R]
-bB=[filteredubhT2G,filteredubhT2R]
-bC=[bpT2G,filteredbpT2R]
-bD=[ubpT2G,ubpT2R]
-
-cA= [filteredbhT3G,filteredbhT3R]
-cB=[filteredubhT3G,filteredubhT3R]
-cC=[bpT3G,filteredbpT3R]
-cD=[ubpT3G,ubpT3R]
+r3 = np.array(r3)
+filteredr3 = r3[~is_outlier(r3)]
+r4 = np.array(r4)
+filteredr4 = r4[~is_outlier(r4)]
+r5 = np.array(r5)
+filteredr5 = r5[~is_outlier(r5)]
+r6 = np.array(r6)
+filteredr6 = r6[~is_outlier(r6)]
+r7 = np.array(r7)
+filteredr7 = r7[~is_outlier(r7)]
 
 
 
-fig, axes = plt.subplots(nrows=1, ncols=1, figsize=(20, 5))
+A= [filteredr3,filteredg3]
+B=[filteredr4,filteredg4]
+C=[filteredr5,filteredg5]
+D=[filteredr6,filteredg6]
+E=[filteredr7,filteredg7]
+# 
+# bA= [filteredbhT2G,filteredbhT2R]
+# bB=[filteredubhT2G,filteredubhT2R]
+# bC=[bpT2G,filteredbpT2R]
+# bD=[ubpT2G,ubpT2R]
+# 
+# cA= [filteredbhT3G,filteredbhT3R]
+# cB=[filteredubhT3G,filteredubhT3R]
+# cC=[bpT3G,filteredbpT3R]
+# cD=[ubpT3G,ubpT3R]
 
-bp = axes[0].boxplot(filteredg3, positions = [1, 2], widths = 0.6,patch_artist=True)
+
+
+#fig, axes = plt.subplots(nrows=2, ncols=1, figsize=(20, 5))
+fig, axes = plt.subplots()
+bp = axes.boxplot(A, positions = [1,2], widths = 0.6,patch_artist=True)
 setBoxColors(bp)
 
 # second boxplot pair
-bp = axes[0].boxplot(filteredg4, positions = [4, 5], widths = 0.6,patch_artist=True)
+bp = axes.boxplot(B, positions = [4,5], widths = 0.6,patch_artist=True)
 setBoxColors(bp)
 
 # thrid boxplot pair
-bp = axes[0].boxplot(filteredg5, positions = [7, 8], widths = 0.6,patch_artist=True)
+bp = axes.boxplot(C, positions = [7,8], widths = 0.6,patch_artist=True)
 setBoxColors(bp)
 
-bp = axes[0].boxplot(filteredg6, positions = [10, 11], widths = 0.6,patch_artist=True)
+bp = axes.boxplot(D, positions = [10,11], widths = 0.6,patch_artist=True)
 setBoxColors(bp)
 
-bp = axes[0].boxplot(filteredg7, positions = [13, 14], widths = 0.6,patch_artist=True)
+bp = axes.boxplot(E, positions = [13,14], widths = 0.6,patch_artist=True)
 setBoxColors(bp)
 
 
 
 
 
-axes[0].set_title('k=16',color='#77933C')
+axes.set_title('k=16',color='#77933C')
 # axes[1].set_title('k=32',color='#77933C')
 # axes[2].set_title('k=64',color='#77933C')
 #axes[1].set_yscale('log')
 #axes[0].set_yscale('log')
 #axes[1].get_yaxis().set_ticks([])
 #axes[2].set_yscale('log')
-axes[0].set_ylabel('Time (ms)',size = 50, color='#77933C')
+axes.set_ylabel('Time (ms)',size = 20, color='Black')
+axes.set_xlabel('Function\'s Chain Size',size = 20, color='Black')
 #axes[1].set_xlabel('Routing Application',size = 30,weight="bold")
-for ax in axes:
-    ax.yaxis.grid(b=True, which='major', color='dimgray', linestyle='--',linewidth = 5.0)
+# for ax in axes:
+#     ax.yaxis.grid(b=True, which='major', color='dimgray', linestyle='--',linewidth = 5.0)
+#     
+#     #ax.set_xticks([y+1 for y in range(len(alldata))])
+# 
+#     ax.set_ylim([0,500])
+#     ax.set_xlim([0,16])
+#     ax.set_xticks([1.5, 4.5, 7.5,10.5,13.5])
+#     ax.set_xticklabels(['3', '4', '5','6','7'],color='#77933C')
+#     ax.tick_params(axis='y', colors='#77933C')
+axes.yaxis.grid(b=True, which='major', color='dimgray', linestyle='--',linewidth = 5.0)
+axes.set_ylim([0,500])
+axes.set_xlim([0,16])
+axes.set_xticks([1.5, 4.5, 7.5,10.5,13.5])
+axes.set_xticklabels(['3', '4', '5','6','7'],color='#77933C')
+axes.tick_params(axis='y', colors='#77933C')
     
-    #ax.set_xticks([y+1 for y in range(len(alldata))])
-
-    ax.set_ylim([0,1000])
-    ax.set_xlim([0,9])
-    ax.set_xticks([1.5, 4.5, 7.5])
-    ax.set_xticklabels(['3', '4', '5','6','7'],color='#77933C')
-    ax.tick_params(axis='y', colors='#77933C')
-
+#for tic in axes[1].yaxis.get_major_ticks():
+#    tic.label1On = tic.label2On = False
     
-for tic in axes[1].yaxis.get_major_ticks():
-    tic.label1On = tic.label2On = False
-    
-for tic in axes[2].yaxis.get_major_ticks():
-    tic.label1On = tic.label2On = False
+#for tic in axes[2].yaxis.get_major_ticks():
+#    tic.label1On = tic.label2On = False
 # set axes limits and labels
 
 
-hB, = axes[0].plot([0,0],'g-',linewidth = 5.0)
-hR, = axes[0].plot([0,0],'-',color='violet', linewidth = 5.0)
-legend = legend((hB, hR),('Gavel', 'Ravel'),loc=(0.55, .01), labelspacing=0.1)
+hB, = axes.plot([0,0],'g-',linewidth = 3.0)
+hR, = axes.plot([0,0],'-',color='Red', linewidth = 3.0)
+legend = legend((hB, hR),('Gavel', 'Ravel'),loc=(0.7, .8), labelspacing=0.1)
 #plt.legend(loc=2,prop={'size':6})
 hB.set_visible(False)
 hR.set_visible(False)
 ltext = plt.gca().get_legend().get_texts()
 plt.setp(ltext[0], fontsize = 20, color = 'g')
-plt.setp(ltext[1], fontsize = 20, color = 'violet')
+plt.setp(ltext[1], fontsize = 20, color = 'Red')
 plt.tight_layout()
 plt.subplots_adjust(bottom=0.1)
 #plt.grid(b=True, which='both', color='dimgray',linestyle='-')
