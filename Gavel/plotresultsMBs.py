@@ -117,7 +117,7 @@ def is_outlier(points, thresh=2.5):
     return modified_z_score > thresh
 
 
-with open('JournalGavel16SFC.txt') as inf:
+with open('JournalGavel32SFC.txt') as inf:
     for line in inf:
         parts = line.split("\t") # split line into parts
         #print parts[4].rstrip()
@@ -254,7 +254,7 @@ setBoxColors(bp)
 
 
 
-axes.set_title('k=16',color='#77933C')
+axes.set_title('k=32',color='#77933C')
 # axes[1].set_title('k=32',color='#77933C')
 # axes[2].set_title('k=64',color='#77933C')
 #axes[1].set_yscale('log')
