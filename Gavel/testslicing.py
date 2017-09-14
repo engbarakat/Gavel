@@ -103,42 +103,43 @@ def runthetest(topologyname,itera,listofpath):
             avgroutinglistperslice.append(aendt - astartt)
             path = Path(key, v, aendt - astartt, 0)
             listofpath.append(path)
-    if len(avgroutinglistperslice) > 0:
-        avgroutingdict[0] = sum(avgroutinglistperslice) / float(len(avgroutinglistperslice))
-    else:
-        avgroutingdict[0] = 0
-    zeroinlist = {0:len(avgroutinglistperslice)}
-    listofzerocounted.append(zeroinlist.copy())
-    #print len(avgroutinglistperslice)
-    del avgroutinglistperslice[:]
+#     if len(avgroutinglistperslice) > 0:
+#         avgroutingdict[0] = sum(avgroutinglistperslice) / float(len(avgroutinglistperslice))
+#     else:
+#         avgroutingdict[0] = 0
+#     zeroinlist = {0:len(avgroutinglistperslice)}
+#     listofzerocounted.append(zeroinlist.copy())
+#     #print len(avgroutinglistperslice)
+#     del avgroutinglistperslice[:]
     
-    for slicesize in range(10):
+    for slicesize in range(1,10,1):
         clearallinstalledpaths(session)
-        if slicesize>0:
-            #delete all existing slices
-            #deleteallslices(session)
-            listofslices.append( createslice(session, slicesize,hoststoroute,allswitches))
+        #delete all existing slices
+        #deleteallslices(session)
+        listofslices.append( createslicemodified(session, slicesize,hoststoroute,allswitches))
             
-            for slice in listofslices:
-                hostlistinslice =  gethostsfromslice(slice)#hostlist should be ready for routing function process
+        for slice in listofslices:
+            hostlistinslice =  gethostsfromslice(slice)#hostlist should be ready for routing function process
                 #print "Testing routing with   {0} slices  between {1} hosts".format(slicesize, len(slice.hosts))
-                for h1,h2 in hostlistinslice.iteritems():
+            for h1,h2 in hostlistinslice.iteritems():
                     
-                    starttime = timeit.default_timer()*1000
-                    result = Routeinslice(session, h1,h2,slice.name)
-                    endtime = timeit.default_timer()*1000
-                    if result:
-                        path = Path(key,v,endtime-starttime,slicesize)
-                        avgroutinglistperslice.append(endtime-starttime)#how to append to multidimention array
-                        listofpath.append(path)
-            if len(avgroutinglistperslice)>0:
-                avgroutingdict[int(slice.name)] = sum(avgroutinglistperslice) / float(len(avgroutinglistperslice))
-            else:
-                avgroutingdict[int(slice.name)] = 0
-            zeroinlist = {slicesize:len(avgroutinglistperslice)}
-            listofzerocounted.append(zeroinlist.copy())
+                starttime = timeit.default_timer()*1000
+                result = Routeinslice(session, h1,h2,slice.name)
+                endtime = timeit.default_timer()*1000
+                if result:
+                    path = Path(h1,h2,endtime-starttime,slicesize)
+                    #avgroutinglistperslice.append(endtime-starttime)#how to append to multidimention array
+                    listofpath.append(path)
+                else:
+                    print "failing path at slice size {}".format(slice.name)
+            #if len(avgroutinglistperslice)>0:
+            #    avgroutingdict[int(slice.name)] = sum(avgroutinglistperslice) / float(len(avgroutinglistperslice))
+            #else:
+            #    avgroutingdict[int(slice.name)] = 0
+            #zeroinlist = {slicesize:len(avgroutinglistperslice)}
+            #listofzerocounted.append(zeroinlist.copy())
             #print len(avgroutinglistperslice)
-            del avgroutinglistperslice[:]
+            #del avgroutinglistperslice[:]
         #routing without slice
             
     #print listofzerocounted
@@ -180,7 +181,7 @@ def runthetest(topologyname,itera,listofpath):
 def writeresults(sizeoffattree,listofpath):    
     fo = open("JournalGavel%sslice.txt" %sizeoffattree, "wb")
     for a in listofpath:
-        fo.write(str(a.host1)+'\t'+str(a.host2) + '\t'+str(a.getpath)+'\t'+str(a.slicesize) + '\n')
+        fo.write(str(a.host1)+'\t'+str(a.host2) + '\t'+str(a.getpath)+'\t'+str(a.slicesize)+'\n')
     fo.close()
 def plotresults(k):
     os.system("gnuplot plotresults%d.gplt" %k)
