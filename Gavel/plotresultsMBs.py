@@ -14,7 +14,11 @@ g5=[]
 g6=[]
 g7=[]
 
-
+r3 = []
+r4=[]
+r5=[]
+r6=[]
+r7=[]
 
 # bpT1R = []
 # bpT1G=[]
@@ -53,21 +57,21 @@ g7=[]
 
 def setBoxColors(bp):
     setp(bp['boxes'][0], color='red')
-    setp(bp['caps'][0], color='red')
-    setp(bp['caps'][0], color='red')
-    setp(bp['whiskers'][0], color='red')
-    setp(bp['whiskers'][0], color='red')
-    setp(bp['fliers'][0], color='red')
-    setp(bp['fliers'][0], color='red')
+#     setp(bp['caps'][0], color='red')
+#     setp(bp['caps'][0], color='red')
+#     setp(bp['whiskers'][0], color='red')
+#     setp(bp['whiskers'][0], color='red')
+#     setp(bp['fliers'][0], color='red')
+#     setp(bp['fliers'][0], color='red')
     setp(bp['medians'][0], color='red')
 
     setp(bp['boxes'][1], color='green')
-    setp(bp['caps'][1], color='green')
-    setp(bp['caps'][1], color='green')
-    setp(bp['whiskers'][1], color='green')
-    setp(bp['whiskers'][1], color='green')
-    setp(bp['fliers'][1], color='green')
-    setp(bp['fliers'][1], color='green')
+#     setp(bp['caps'][1], color='green')
+#     setp(bp['caps'][1], color='green')
+#     setp(bp['whiskers'][1], color='green')
+#     setp(bp['whiskers'][1], color='green')
+#     setp(bp['fliers'][1], color='green')
+#     setp(bp['fliers'][1], color='green')
     setp(bp['medians'][1], color='green')
 
 def setBoxColorsspe(bp):
@@ -117,7 +121,7 @@ def is_outlier(points, thresh=2.5):
     return modified_z_score > thresh
 
 
-with open('JournalGavel32SFC.txt') as inf:
+with open('JournalGavel64SFC.txt') as inf:
     for line in inf:
         parts = line.split("\t") # split line into parts
         #print parts[4].rstrip()
@@ -133,7 +137,15 @@ with open('JournalGavel32SFC.txt') as inf:
         elif parts[4].rstrip() == '7':
             g7.append(float(parts[2]))
 
-
+with open('ravel64SFC.txt') as inf:
+    for line in inf:
+        parts = line.split('\t')
+        r3.append(float(parts[0]))
+        r4.append(float(parts[1]))
+        r5.append(float(parts[2]))
+        r6.append(float(parts[3]))
+        r7.append(float(parts[4]))
+        
 # with open('Postergavelresults16all.txt') as inf:
 #     for line in inf:
 #         parts = line.split("    ") # split line into parts
@@ -142,7 +154,7 @@ with open('JournalGavel32SFC.txt') as inf:
 #         bpT1G.append( float(parts[3]))
 #         ubpT1G.append( float(parts[3]))
 # 
-# with open('ravelresultsall32.txt') as inf:
+# with open('ravelresultsall64.txt') as inf:
 #     for line in inf:
 #         parts = line.split("    ") # split line into parts
 #         bhT2R.append( float(parts[0]))
@@ -151,7 +163,7 @@ with open('JournalGavel32SFC.txt') as inf:
 #         ubpT2R.append( float(parts[3]))
 # 
 # 
-# with open('Postergavelresults32all.txt') as inf:
+# with open('Postergavelresults64all.txt') as inf:
 #     for line in inf:
 #         parts = line.split("    ") # split line into parts
 #         bhT2G.append( float(parts[2]))
@@ -178,11 +190,7 @@ with open('JournalGavel32SFC.txt') as inf:
 #         ubpT3G.append( float(parts[3]))
 #     
 
-r3 = g3
-r4=g4
-r5=g5
-r6=g6
-r7=g7
+
 
 
 
@@ -254,35 +262,25 @@ setBoxColors(bp)
 
 
 
-axes.set_title('k=32',color='#77933C')
+axes.set_title('K=64',color='Black',size=20)
 # axes[1].set_title('k=32',color='#77933C')
 # axes[2].set_title('k=64',color='#77933C')
-#axes[1].set_yscale('log')
+axes.set_yscale('log')
 #axes[0].set_yscale('log')
 #axes[1].get_yaxis().set_ticks([])
 #axes[2].set_yscale('log')
 axes.set_ylabel('Time (ms)',size = 20, color='Black')
-axes.set_xlabel('Function\'s Chain Size',size = 20, color='Black')
-#axes[1].set_xlabel('Routing Application',size = 30,weight="bold")
-# for ax in axes:
-#     ax.yaxis.grid(b=True, which='major', color='dimgray', linestyle='--',linewidth = 5.0)
-#     
-#     #ax.set_xticks([y+1 for y in range(len(alldata))])
-# 
-#     ax.set_ylim([0,500])
-#     ax.set_xlim([0,16])
-#     ax.set_xticks([1.5, 4.5, 7.5,10.5,13.5])
-#     ax.set_xticklabels(['3', '4', '5','6','7'],color='#77933C')
-#     ax.tick_params(axis='y', colors='#77933C')
+axes.set_xlabel('Functions\' Chain Size',size = 20, color='Black')
+
 axes.yaxis.grid(b=True, which='major', color='dimgray', linestyle='--',linewidth = 5.0)
-axes.set_ylim([0,500])
+axes.set_ylim([1,8000])
 axes.set_xlim([0,16])
 axes.set_xticks([1.5, 4.5, 7.5,10.5,13.5])
-axes.set_xticklabels(['3', '4', '5','6','7'],color='#77933C')
-axes.tick_params(axis='y', colors='#77933C')
+axes.set_xticklabels(['3', '4', '5','6','7'],color='black',size=14)
+axes.tick_params(axis='y', colors='black',size=14)
     
-#for tic in axes[1].yaxis.get_major_ticks():
-#    tic.label1On = tic.label2On = False
+for tic in axes.yaxis.get_major_ticks():
+    tic.label.set_fontsize(14)
     
 #for tic in axes[2].yaxis.get_major_ticks():
 #    tic.label1On = tic.label2On = False
@@ -291,7 +289,7 @@ axes.tick_params(axis='y', colors='#77933C')
 
 hB, = axes.plot([0,0],'g-',linewidth = 3.0)
 hR, = axes.plot([0,0],'-',color='Red', linewidth = 3.0)
-legend = legend((hB, hR),('Gavel', 'Ravel'),loc=(0.7, .8), labelspacing=0.1)
+legend = legend((hB, hR),('Gavel', 'Ravel'),loc=(0.85, .8), labelspacing=0.1)
 #plt.legend(loc=2,prop={'size':6})
 hB.set_visible(False)
 hR.set_visible(False)
