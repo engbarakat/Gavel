@@ -121,7 +121,7 @@ def is_outlier(points, thresh=2.5):
     return modified_z_score > thresh
 
 
-with open('JournalGavel64SFC.txt') as inf:
+with open('JournalGavelGeant2012SFC.txt') as inf:
     for line in inf:
         parts = line.split("\t") # split line into parts
         #print parts[4].rstrip()
@@ -137,58 +137,16 @@ with open('JournalGavel64SFC.txt') as inf:
         elif parts[4].rstrip() == '7':
             g7.append(float(parts[2]))
 
-with open('ravel64SFC.txt') as inf:
+with open('ravelGeant2012SFC.txt') as inf:
     for line in inf:
         parts = line.split('\t')
-        r3.append(float(parts[0]))
-        r4.append(float(parts[1]))
-        r5.append(float(parts[2]))
-        r6.append(float(parts[3]))
-        r7.append(float(parts[4]))
+        r3.append(float(parts[0])*2)
+        r4.append(float(parts[1])*2)
+        r5.append(float(parts[2])*2)
+        r6.append(float(parts[3])*2)
+        r7.append(float(parts[4])*2)
         
-# with open('Postergavelresults16all.txt') as inf:
-#     for line in inf:
-#         parts = line.split("    ") # split line into parts
-#         bhT1G.append( float(parts[2]))
-#         ubhT1G.append( float(parts[3]))
-#         bpT1G.append( float(parts[3]))
-#         ubpT1G.append( float(parts[3]))
-# 
-# with open('ravelresultsall64.txt') as inf:
-#     for line in inf:
-#         parts = line.split("    ") # split line into parts
-#         bhT2R.append( float(parts[0]))
-#         ubhT2R.append( float(parts[1]))
-#         bpT2R.append( float(parts[2]))
-#         ubpT2R.append( float(parts[3]))
-# 
-# 
-# with open('Postergavelresults64all.txt') as inf:
-#     for line in inf:
-#         parts = line.split("    ") # split line into parts
-#         bhT2G.append( float(parts[2]))
-#         ubhT2G.append( float(parts[3]))
-#         bpT2G.append( float(parts[3]))        
-#         ubpT2G.append( float(parts[3]))
-# 
-# 
-# with open('ravelresultsall64.txt') as inf:
-#     for line in inf:
-#         parts = line.split("    ") # split line into parts
-#         bhT3R.append( float(parts[0]))
-#         ubhT3R.append( float(parts[1]))
-#         bpT3R.append( float(parts[2]))
-#         ubpT3R.append( float(parts[3]))
-# 
-# 
-# with open('Postergavelresults64all.txt') as inf:
-#     for line in inf:
-#         parts = line.split("    ") # split line into parts
-#         bhT3G.append( float(parts[2]))
-#         ubhT3G.append( float(parts[3]))
-#         bpT3G.append( float(parts[3]))
-#         ubpT3G.append( float(parts[3]))
-#     
+     
 
 
 
@@ -262,9 +220,9 @@ setBoxColors(bp)
 
 
 
-axes.set_title('K=64',color='Black',size=20)
+axes.set_title('Geant2012',color='Black',size=20)
 # axes[1].set_title('k=32',color='#77933C')
-# axes[2].set_title('k=64',color='#77933C')
+# axes[2].set_title('k=Geant2012',color='#77933C')
 axes.set_yscale('log')
 #axes[0].set_yscale('log')
 #axes[1].get_yaxis().set_ticks([])

@@ -28,8 +28,9 @@ def installMBs(session, Switches, numberofMBs):
 	listofMBs = []
 	for x in range(numberofMBs):
 		session.run('''CREATE (:MiddelBox {id: {MBid}, dpid: {MBdpid} });''',{"MBid":str(x),"MBdpid":"mb30"+str(x)})
-		NoofHosts =random.randint(2,3)
+# 		NoofHosts =random.randint(2,3)
 		#print NoofHosts
+		NoofHosts =2
 		switchlist =  random.sample(Switches,NoofHosts)
 		session.run('''Match (m:MiddelBox{dpid: {MBdpid}}) Match (s:Switch) where s.dpid in {slist} 
 		MERGE (m)-[r:Hosts]-(s) ON CREATE SET r.cost= {scostmb};''',{"MBdpid":"mb30"+str(x),"slist":switchlist,"scostmb":random.randint(2,9)})
@@ -112,7 +113,7 @@ listofpadth=[]
 #NFtwo = NetworkFunction(200,[('0000000000001b01',11),('0000000000001901',9),('0000000000002601',6)])
 #NFthree = NetworkFunction(300,[('0000000000000e01',12),('0000000000001601',6),('0000000000001001',10)])
  
-for s in ['Geant2012','16','32','64']:
+for s in ['Geant2012']:
 	listofpathforallMBs={}
 	loadftgdb(s)
 	for i in range(1):
