@@ -150,7 +150,7 @@ def iteratetoplot(topologyname):
 for i in range(10):
     os.system("python testslicing.py")
     #for t in ['Geant2012','16','32']:
-    iteratetoplot("64")
+    iteratetoplot("Geant2012")
 finalavg = []
  
 for n in range (10):
@@ -159,183 +159,18 @@ for n in range (10):
     else:
         finalavg.append(sum(allavgofarrays[0])/float(len(allavgofarrays[0])))
 
-  
-# with open('Postergavelresults16all.txt') as inf:
-#     for line in inf:
-#         parts = line.split("    ") # split line into parts
-#         bhT1G.append( float(parts[2]))
-#         ubhT1G.append( float(parts[3]))
-#         bpT1G.append( float(parts[3]))
-#         ubpT1G.append( float(parts[3]))
-# 
-# with open('ravelresultsall32.txt') as inf:
-#     for line in inf:
-#         parts = line.split("    ") # split line into parts
-#         bhT2R.append( float(parts[0]))
-#         ubhT2R.append( float(parts[1]))
-#         bpT2R.append( float(parts[2]))
-#         ubpT2R.append( float(parts[3]))
-# 
-# 
-# with open('Postergavelresults32all.txt') as inf:
-#     for line in inf:
-#         parts = line.split("    ") # split line into parts
-#         bhT2G.append( float(parts[2]))
-#         ubhT2G.append( float(parts[3]))
-#         bpT2G.append( float(parts[3]))        
-#         ubpT2G.append( float(parts[3]))
-# 
-# 
-# with open('ravelresultsall64.txt') as inf:
-#     for line in inf:
-#         parts = line.split("    ") # split line into parts
-#         bhT3R.append( float(parts[0]))
-#         ubhT3R.append( float(parts[1]))
-#         bpT3R.append( float(parts[2]))
-#         ubpT3R.append( float(parts[3]))
-# 
-# 
-# with open('Postergavelresults64all.txt') as inf:
-#     for line in inf:
-#         parts = line.split("    ") # split line into parts
-#         bhT3G.append( float(parts[2]))
-#         ubhT3G.append( float(parts[3]))
-#         bpT3G.append( float(parts[3]))
-#         ubpT3G.append( float(parts[3]))
-#     
 
-# r3 = g3
-# r4=g4
-# r5=g5
-# r6=g6
-# r7=g7
-# 
-# 
-# 
-# g3 = np.array(g3)
-# filteredg3 = g3[~is_outlier(g3)]
-# g4 = np.array(g4)
-# filteredg4 = g4[~is_outlier(g4)]
-# g5 = np.array(g5)
-# filteredg5 = g5[~is_outlier(g5)]
-# g6 = np.array(g6)
-# filteredg6 = g6[~is_outlier(g6)]
-# g7 = np.array(g7)
-# filteredg7 = g7[~is_outlier(g7)]
-# 
-# 
-# 
-# 
-# r3 = np.array(r3)
-# filteredr3 = r3[~is_outlier(r3)]
-# r4 = np.array(r4)
-# filteredr4 = r4[~is_outlier(r4)]
-# r5 = np.array(r5)
-# filteredr5 = r5[~is_outlier(r5)]
-# r6 = np.array(r6)
-# filteredr6 = r6[~is_outlier(r6)]
-# r7 = np.array(r7)
-# filteredr7 = r7[~is_outlier(r7)]
-# 
-# 
-# 
-# A= [filteredr3,filteredg3]
-# B=[filteredr4,filteredg4]
-# C=[filteredr5,filteredg5]
-# D=[filteredr6,filteredg6]
-# E=[filteredr7,filteredg7]
-# 
-# bA= [filteredbhT2G,filteredbhT2R]
-# bB=[filteredubhT2G,filteredubhT2R]
-# bC=[bpT2G,filteredbpT2R]
-# bD=[ubpT2G,ubpT2R]
-# 
-# cA= [filteredbhT3G,filteredbhT3R]
-# cB=[filteredubhT3G,filteredubhT3R]
-# cC=[bpT3G,filteredbpT3R]
-# cD=[ubpT3G,ubpT3R]
 index = np.arange(10)
 plt.bar(index, finalavg, 0.5,
                  alpha=0.4,
                  color='g')
 
 plt.xlabel('No. of Slices')
-plt.ylabel('Time (s)')
-plt.title('k=16')
+plt.ylabel('Time (ms)')
+plt.title('Geant2012')
 plt.xticks(index  , ('0', '1', '2', '3', '4','5', '6', '7','8','9'))
 plt.legend()
 
 plt.tight_layout()
 plt.show()
-#fig, axes = plt.subplots(nrows=2, ncols=1, figsize=(20, 5))
-# fig, axes = plt.subplots()
-# bp = axes.boxplot(A, positions = [1,2], widths = 0.6,patch_artist=True)
-# setBoxColors(bp)
-# 
-# # second boxplot pair
-# bp = axes.boxplot(B, positions = [4,5], widths = 0.6,patch_artist=True)
-# setBoxColors(bp)
-# 
-# # thrid boxplot pair
-# bp = axes.boxplot(C, positions = [7,8], widths = 0.6,patch_artist=True)
-# setBoxColors(bp)
-# 
-# bp = axes.boxplot(D, positions = [10,11], widths = 0.6,patch_artist=True)
-# setBoxColors(bp)
-# 
-# bp = axes.boxplot(E, positions = [13,14], widths = 0.6,patch_artist=True)
-# setBoxColors(bp)
-# 
-# 
-# 
-# 
-# 
-# axes.set_title('k=32',color='#77933C')
-# # axes[1].set_title('k=32',color='#77933C')
-# # axes[2].set_title('k=64',color='#77933C')
-# #axes[1].set_yscale('log')
-# #axes[0].set_yscale('log')
-# #axes[1].get_yaxis().set_ticks([])
-# #axes[2].set_yscale('log')
-# axes.set_ylabel('Time (ms)',size = 20, color='Black')
-# axes.set_xlabel('Function\'s Chain Size',size = 20, color='Black')
-# #axes[1].set_xlabel('Routing Application',size = 30,weight="bold")
-# # for ax in axes:
-# #     ax.yaxis.grid(b=True, which='major', color='dimgray', linestyle='--',linewidth = 5.0)
-# #     
-# #     #ax.set_xticks([y+1 for y in range(len(alldata))])
-# # 
-# #     ax.set_ylim([0,500])
-# #     ax.set_xlim([0,16])
-# #     ax.set_xticks([1.5, 4.5, 7.5,10.5,13.5])
-# #     ax.set_xticklabels(['3', '4', '5','6','7'],color='#77933C')
-# #     ax.tick_params(axis='y', colors='#77933C')
-# axes.yaxis.grid(b=True, which='major', color='dimgray', linestyle='--',linewidth = 5.0)
-# axes.set_ylim([0,500])
-# axes.set_xlim([0,16])
-# axes.set_xticks([1.5, 4.5, 7.5,10.5,13.5])
-# axes.set_xticklabels(['3', '4', '5','6','7'],color='#77933C')
-# axes.tick_params(axis='y', colors='#77933C')
-#     
-# #for tic in axes[1].yaxis.get_major_ticks():
-# #    tic.label1On = tic.label2On = False
-#     
-# #for tic in axes[2].yaxis.get_major_ticks():
-# #    tic.label1On = tic.label2On = False
-# # set axes limits and labels
-# 
-# 
-# hB, = axes.plot([0,0],'g-',linewidth = 3.0)
-# hR, = axes.plot([0,0],'-',color='Red', linewidth = 3.0)
-# legend = legend((hB, hR),('Gavel', 'Ravel'),loc=(0.7, .8), labelspacing=0.1)
-# #plt.legend(loc=2,prop={'size':6})
-# hB.set_visible(False)
-# hR.set_visible(False)
-# ltext = plt.gca().get_legend().get_texts()
-# plt.setp(ltext[0], fontsize = 20, color = 'g')
-# plt.setp(ltext[1], fontsize = 20, color = 'Red')
-# plt.tight_layout()
-# plt.subplots_adjust(bottom=0.1)
-# #plt.grid(b=True, which='both', color='dimgray',linestyle='-')
-# plt.setp(legend.get_texts(), fontsize='30')
-# plt.show()
+

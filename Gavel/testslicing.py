@@ -32,12 +32,13 @@ def createslice(session,size,allhosts,allswitches):
     for h in random.sample(allhosts,random.sample(hostsnumberpossible,1)[0]):
         hoststobeadded.append(h)
     
-    switchnumerpossible = [n for n in range(5,len(allswitches))]
+    #switchnumerpossible = [n for n in range(5,len(allswitches))]
+    switchnumerpossible = [25]
     
     for h in random.sample(allswitches,random.sample(switchnumerpossible,1)[0]):
         switchestobeadded.append(h)
     
-    Createslicegavel(session,switchestobeadded, hoststobeadded,str(size))
+    Createslicegavel(session,switchestobeadded, allhosts,str(size))
     print ("** The slice No. {2} with {0} hosts and {1} switch was created\n").format(len(hoststobeadded),len(switchestobeadded),size)
     return Slice(hoststobeadded,switchestobeadded,str(size))
     
@@ -76,6 +77,7 @@ def runthetest(topologyname,itera,listofpath):
     avgroutinglistperslice=[]
     hoststoroute= []
     listofzerocounted = []
+    switchesinslice= []
     
     result = session.run('''Match (h:Host) return h.ip AS ip ''')
     for host in result:
@@ -98,8 +100,10 @@ def runthetest(topologyname,itera,listofpath):
  
     for key, v in hostlistready.iteritems():
         astartt = timeit.default_timer() * 1000
-        if getroute(key, v, session):
+        result = getroute(key, v, session)
+        if (result!= False):
             aendt = timeit.default_timer() * 1000
+            switchesinslice.extend(result)
             avgroutinglistperslice.append(aendt - astartt)
             path = Path(key, v, aendt - astartt, 0)
             listofpath.append(path)
@@ -132,51 +136,7 @@ def runthetest(topologyname,itera,listofpath):
                     listofpath.append(path)
                 else:
                     print "failing path at slice size {}".format(slice.name)
-            #if len(avgroutinglistperslice)>0:
-            #    avgroutingdict[int(slice.name)] = sum(avgroutinglistperslice) / float(len(avgroutinglistperslice))
-            #else:
-            #    avgroutingdict[int(slice.name)] = 0
-            #zeroinlist = {slicesize:len(avgroutinglistperslice)}
-            #listofzerocounted.append(zeroinlist.copy())
-            #print len(avgroutinglistperslice)
-            #del avgroutinglistperslice[:]
-        #routing without slice
-            
-    #print listofzerocounted
-    #for k,v in avgroutingdict.iteritems():
-       # print k,v
-    
-#     hostlistready = {}
-#     listoftimea = []
-#     listoftimeb = []
-#     switchlist= ["0000000000001701","0000000000001d01","0000000000001c01","0000000000001b01","0000000000001601","0000000000001a01"]
-#     hostlist= ["10.3.29.30","10.3.26.27"]
-#     result = session.run('''Match (h:Switch) return h.dpid AS dpid ''')
-#     resultlistnotrandom = list(result)
-#     for x in random.sample(resultlistnotrandom,38):
-#         switchlist.append(x["dpid"]) 
-#      
-#      
-#     result = session.run('''Match (h:Host) return h.ip AS ip ''')
-#     resultlistnotrandom = list(result)
-#     for h in random.sample(resultlistnotrandom,10):
-#         hostlist.append(h["ip"]) 
-# #     print switchlist,hostlist
-#     Createslice(session,switchlist, hostlist,"Osamah")
-#     #print resultlist
-#     #resultlist = list(result)
-# 
-#     for n in xrange(0,len(hostlist), 2):
-#         hostlistready[hostlist[n]] = hostlist[n+1]
-# 
-#     for key,v in hostlistready.iteritems():
-#         #print key, v
-#         astartt = timeit.default_timer() *1000
-#         Routeinslice(session,key,v,"slice")
-#         aendt = timeit.default_timer() *1000
-#         path = Path(key,v,aendt-astartt,0)
-#         listofpath.append(path)
-#         ########################################################################################################
+
 
 def writeresults(sizeoffattree,listofpath):    
     fo = open("JournalGavel%sslice.txt" %sizeoffattree, "wb")
@@ -191,7 +151,7 @@ listofpadth=[]
 #NFtwo = NetworkFunction(200,[('0000000000001b01',11),('0000000000001901',9),('0000000000002601',6)])
 #NFthree = NetworkFunction(300,[('0000000000000e01',12),('0000000000001601',6),('0000000000001001',10)])
  
-for s in ['64']:
+for s in ['Geant2012']:
     listofpath=[]
     loadftgdb(s)
     for i in range(1):
