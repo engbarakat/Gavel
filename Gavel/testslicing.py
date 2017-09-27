@@ -128,9 +128,9 @@ def runthetest(topologyname,itera,listofpath):
             for h1,h2 in hostlistinslice.iteritems():
                     
                 starttime = timeit.default_timer()*1000
-                result = Routeinslice(session, h1,h2,slice.name)
+                result = getroute(h1, h2, session)
                 endtime = timeit.default_timer()*1000
-                if result:
+                if (result!= False):
                     path = Path(h1,h2,endtime-starttime,slicesize)
                     #avgroutinglistperslice.append(endtime-starttime)#how to append to multidimention array
                     listofpath.append(path)
