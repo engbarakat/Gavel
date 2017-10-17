@@ -121,7 +121,7 @@ def is_outlier(points, thresh=2.5):
     return modified_z_score > thresh
 
 
-with open('JournalGavelGeant2012SFC.txt') as inf:
+with open('JournalGavel64SFC.txt') as inf:
     for line in inf:
         parts = line.split("\t") # split line into parts
         #print parts[4].rstrip()
@@ -137,7 +137,7 @@ with open('JournalGavelGeant2012SFC.txt') as inf:
         elif parts[4].rstrip() == '7':
             g7.append(float(parts[2]))
 
-with open('ravelGeant2012SFC.txt') as inf:
+with open('ravel64SFC.txt') as inf:
     for line in inf:
         parts = line.split('\t')
         r3.append(float(parts[0])*2)
@@ -231,7 +231,7 @@ axes.set_ylabel('Time (ms)',size = 50, color='Black')
 axes.set_xlabel('Functions\' Chain Size',size = 50, color='Black')
 
 axes.yaxis.grid(b=True, which='major', color='dimgray', linestyle='--',linewidth = 5.0)
-axes.set_ylim([1,8000])
+axes.set_ylim([1,80000])
 axes.set_xlim([0,16])
 axes.set_xticks([1.5, 4.5, 7.5,10.5,13.5])
 axes.set_xticklabels(['3', '4', '5','6','7'],color='black',size=35)
@@ -247,7 +247,7 @@ for tic in axes.yaxis.get_major_ticks():
 
 hB, = axes.plot([0,0],'g-',linewidth = 3.0)
 hR, = axes.plot([0,0],'-',color='Red', linewidth = 3.0)
-legend = legend((hB, hR),('Gavel', 'Ravel'),loc=(0.8, .8), labelspacing=0.1)
+legend = legend((hB, hR),('Gavel', 'Ravel'),loc=(0.85, .7), labelspacing=0.1)
 #plt.legend(loc=2,prop={'size':6})
 hB.set_visible(False)
 hR.set_visible(False)
