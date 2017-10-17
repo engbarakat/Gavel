@@ -234,11 +234,11 @@ axes.yaxis.grid(b=True, which='major', color='dimgray', linestyle='--',linewidth
 axes.set_ylim([1,8000])
 axes.set_xlim([0,16])
 axes.set_xticks([1.5, 4.5, 7.5,10.5,13.5])
-axes.set_xticklabels(['3', '4', '5','6','7'],color='black',size=25)
-axes.tick_params(axis='y', colors='black',size=25)
+axes.set_xticklabels(['3', '4', '5','6','7'],color='black',size=35)
+axes.tick_params(axis='y', colors='black',size=35)
     
 for tic in axes.yaxis.get_major_ticks():
-    tic.label.set_fontsize(25)
+    tic.label.set_fontsize(35)
     
 #for tic in axes[2].yaxis.get_major_ticks():
 #    tic.label1On = tic.label2On = False
