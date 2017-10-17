@@ -3,6 +3,8 @@ import numpy as np
 from matplotlib.patches import Polygon
 from pylab import plot, show, savefig, xlim, figure, hold, ylim, legend, boxplot, setp, axes
 from neo4j.v1.result import BoltStatementResultSummary
+from scipy.stats import ttest_ind, ttest_ind_from_stats
+from scipy.special import stdtr
 import os
 #plt.rcParams.update({'font.size': 40, 'legend.fontsize': 30,'font.color': '#77933C', 'xtick.major.pad':25, 'legend.linewidth': 2})
 
@@ -88,7 +90,7 @@ def is_outlier(points, thresh=2.5):
     """
     Returns a boolean array with True if points are outliers and False 
     otherwise.
-
+fixed
     Parameters:
     -----------
         points : An numobservations by numdimensions array of observations
@@ -135,6 +137,9 @@ def iteratetoplot(topologyname):
             parts = line.split("\t") # split line into parts
             g[int(parts[3].rstrip())].append(float (parts[2]))
     gavg = []
+    gforptest = np.concatenate((g[1],g[4]))
+    t, p = ttest_ind(g[0], gforptest, equal_var=False)
+    print t,p
 
     for n in range (10):
         if n > 0:
@@ -147,7 +152,7 @@ def iteratetoplot(topologyname):
     
 
    
-for i in range(10):
+for i in range(2):
     os.system("python testslicing.py")
     #for t in ['Geant2012','16','32']:
     iteratetoplot("Geant2012")
