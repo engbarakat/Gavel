@@ -220,25 +220,25 @@ setBoxColors(bp)
 
 
 
-axes.set_title('Geant2012',color='Black',size=20)
+#axes.set_title('Geant2012',color='Black',size=20)
 # axes[1].set_title('k=32',color='#77933C')
 # axes[2].set_title('k=Geant2012',color='#77933C')
 axes.set_yscale('log')
 #axes[0].set_yscale('log')
 #axes[1].get_yaxis().set_ticks([])
 #axes[2].set_yscale('log')
-axes.set_ylabel('Time (ms)',size = 20, color='Black')
-axes.set_xlabel('Functions\' Chain Size',size = 20, color='Black')
+axes.set_ylabel('Time (ms)',size = 50, color='Black')
+axes.set_xlabel('Functions\' Chain Size',size = 50, color='Black')
 
 axes.yaxis.grid(b=True, which='major', color='dimgray', linestyle='--',linewidth = 5.0)
 axes.set_ylim([1,8000])
 axes.set_xlim([0,16])
 axes.set_xticks([1.5, 4.5, 7.5,10.5,13.5])
-axes.set_xticklabels(['3', '4', '5','6','7'],color='black',size=14)
-axes.tick_params(axis='y', colors='black',size=14)
+axes.set_xticklabels(['3', '4', '5','6','7'],color='black',size=25)
+axes.tick_params(axis='y', colors='black',size=25)
     
 for tic in axes.yaxis.get_major_ticks():
-    tic.label.set_fontsize(14)
+    tic.label.set_fontsize(25)
     
 #for tic in axes[2].yaxis.get_major_ticks():
 #    tic.label1On = tic.label2On = False
@@ -247,7 +247,7 @@ for tic in axes.yaxis.get_major_ticks():
 
 hB, = axes.plot([0,0],'g-',linewidth = 3.0)
 hR, = axes.plot([0,0],'-',color='Red', linewidth = 3.0)
-legend = legend((hB, hR),('Gavel', 'Ravel'),loc=(0.85, .8), labelspacing=0.1)
+legend = legend((hB, hR),('Gavel', 'Ravel'),loc=(0.8, .8), labelspacing=0.1)
 #plt.legend(loc=2,prop={'size':6})
 hB.set_visible(False)
 hR.set_visible(False)
