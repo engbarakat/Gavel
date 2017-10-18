@@ -56,14 +56,14 @@ r7=[]
 
 
 def setBoxColors(bp):
-    setp(bp['boxes'][0], color='red')
-#     setp(bp['caps'][0], color='red')
-#     setp(bp['caps'][0], color='red')
-#     setp(bp['whiskers'][0], color='red')
-#     setp(bp['whiskers'][0], color='red')
-#     setp(bp['fliers'][0], color='red')
-#     setp(bp['fliers'][0], color='red')
-    setp(bp['medians'][0], color='red')
+    setp(bp['boxes'][0], color='#C00000')
+#     setp(bp['caps'][0], color='#C00000')
+#     setp(bp['caps'][0], color='#C00000')
+#     setp(bp['whiskers'][0], color='#C00000')
+#     setp(bp['whiskers'][0], color='#C00000')
+#     setp(bp['fliers'][0], color='#C00000')
+#     setp(bp['fliers'][0], color='#C00000')
+    setp(bp['medians'][0], color='#C00000')
 
     setp(bp['boxes'][1], color='green')
 #     setp(bp['caps'][1], color='green')
@@ -121,7 +121,7 @@ def is_outlier(points, thresh=2.5):
     return modified_z_score > thresh
 
 
-with open('JournalGavel64SFC.txt') as inf:
+with open('JournalGavelGeant2012SFC.txt') as inf:
     for line in inf:
         parts = line.split("\t") # split line into parts
         #print parts[4].rstrip()
@@ -137,7 +137,7 @@ with open('JournalGavel64SFC.txt') as inf:
         elif parts[4].rstrip() == '7':
             g7.append(float(parts[2]))
 
-with open('ravel64SFC.txt') as inf:
+with open('ravelGeant2012SFC.txt') as inf:
     for line in inf:
         parts = line.split('\t')
         r3.append(float(parts[0])*2)
@@ -246,14 +246,14 @@ for tic in axes.yaxis.get_major_ticks():
 
 
 hB, = axes.plot([0,0],'g-',linewidth = 3.0)
-hR, = axes.plot([0,0],'-',color='Red', linewidth = 3.0)
+hR, = axes.plot([0,0],'-',color='#C00000', linewidth = 3.0)
 legend = legend((hB, hR),('Gavel', 'Ravel'),loc=(0.85, .7), labelspacing=0.1)
 #plt.legend(loc=2,prop={'size':6})
 hB.set_visible(False)
 hR.set_visible(False)
 ltext = plt.gca().get_legend().get_texts()
 plt.setp(ltext[0], fontsize = 20, color = 'g')
-plt.setp(ltext[1], fontsize = 20, color = 'Red')
+plt.setp(ltext[1], fontsize = 20, color = '#C00000')
 plt.tight_layout()
 plt.subplots_adjust(bottom=0.1)
 #plt.grid(b=True, which='both', color='dimgray',linestyle='-')
