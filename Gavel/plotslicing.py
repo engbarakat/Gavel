@@ -152,7 +152,7 @@ def iteratetoplot(topologyname):
     
 
    
-for i in range(2):
+for i in range(5):
     os.system("python testslicing.py")
     #for t in ['Geant2012','16','32']:
     iteratetoplot("Geant2012")
