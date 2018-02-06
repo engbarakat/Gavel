@@ -151,7 +151,7 @@ listofpadth=[]
 #NFtwo = NetworkFunction(200,[('0000000000001b01',11),('0000000000001901',9),('0000000000002601',6)])
 #NFthree = NetworkFunction(300,[('0000000000000e01',12),('0000000000001601',6),('0000000000001001',10)])
  
-for s in ['Geant2012']:
+for s in ['16']:
     listofpath=[]
     loadftgdb(s)
     for i in range(1):

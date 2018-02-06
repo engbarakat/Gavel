@@ -138,7 +138,8 @@ def iteratetoplot(topologyname):
             g[int(parts[3].rstrip())].append(float (parts[2]))
     gavg = []
     gforptest = np.concatenate((g[1],g[4]))
-    t, p = ttest_ind(g[0], gforptest, equal_var=False)
+    t, p = ttest_ind( g[8],g[0], equal_var=True)
+    #print g[5],g[8]
     print t,p
 
     for n in range (10):
@@ -153,9 +154,9 @@ def iteratetoplot(topologyname):
 
    
 for i in range(5):
-    os.system("python testslicing.py")
+    #os.system("python testslicing.py")
     #for t in ['Geant2012','16','32']:
-    iteratetoplot("Geant2012")
+    iteratetoplot("16")
 finalavg = []
  
 for n in range (10):
