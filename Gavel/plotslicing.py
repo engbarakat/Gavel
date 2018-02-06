@@ -137,9 +137,14 @@ def iteratetoplot(topologyname):
             parts = line.split("\t") # split line into parts
             g[int(parts[3].rstrip())].append(float (parts[2]))
     gavg = []
-    gforptest = np.concatenate((g[1],g[4]))
-    t, p = ttest_ind( g[8],g[0], equal_var=True)
+    parry = []
+    parry[0] = 0
+    #gforptest = np.concatenate((g[1],g[4]))
+    t, p = ttest_ind( g[8],g[0], equal_var=False)
     #print g[5],g[8]
+    for n in range(9):
+        t,p =  ttest_ind(g[0],g[n+1])
+        parry[n+1] = p
     print t,p
 
     for n in range (10):
