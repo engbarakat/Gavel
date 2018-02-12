@@ -146,11 +146,11 @@ def file_len(fname):
 def iteratetoplot(topologyname):
     print file_len('JournalGavel%sslicesavgdelay.txt' %topologyname)
     g = [[] for n in range(file_len('JournalGavel%sslicesavgdelay.txt' %topologyname))]
-    gnew = [[] for n in range(10)]
+    avgready = [[] for n in range(file_len('JournalGavel%sslicesavgdelay.txt' %topologyname))]
+    gslicezero = []
     slice = 0 
     with open('JournalGavel%sslicesavgdelay.txt' %topologyname) as inf:
         for line in inf:
-            
             parts = line.split("\t") # split line into parts
             
             for p in parts:
@@ -159,13 +159,19 @@ def iteratetoplot(topologyname):
                 else:
                     g[slice].append(float (p))
             slice = slice +1
-    print len(g)
-    for a in g:
-        print len(a)
-    
-    for n in range (10):
-        if n >1:
-            gnew[n].extend (avgofdelays(g[n],n))
+    arrayofreadyavg = []
+    for hostpairs in g:
+        index = 1
+        listofavg = []
+        for avgvalue in hostpairs:
+            listofavg.append(numpy.mean(avgvalue[:index]))
+            index = index + 1
+        arrayofreadyavg.append(listofavg)
+    pvaluearray = []
+    ## now arrange all arays to contain all values correctly you need 10 arrays.
+    t,p =  ttest_ind(gslicezero[0],g[0])
+    pvaluearray.append( p)
+    for n in range len()
             
     
     gavg = []
