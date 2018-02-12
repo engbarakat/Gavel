@@ -121,30 +121,63 @@ fixed
 
 
 
-def writeallavg(topologyname,gavg):
-    with open('allavgJournalGavel%sslice.txt' %topologyname, "a") as myfile:
+def writeallavg(topologyname,gavg,parry):
+    with open('allavgJournalGavel%sslice.txt' %topologyname, "wb") as myfile:
         for n in gavg:
+            myfile.write(str (n) + ' ')
+        myfile.write('\n')
+        for n in parry:
             myfile.write(str (n) + ' ')
         myfile.write('\n')
 
 
 
-
+def avgofdelays(delays, cluster):
+    if (cluster == 2):
+        #print delays,delays[:len(delays)/2],delays[len(delays)/2:]
+        return [0.5 *(x + y) for x, y in zip(delays[:len(delays)/2], delays[len(delays)/2:])]
+    elif(cluster == 3 ):
+        return [0.3333 *(x + y+ z) for x, y,z  in zip(delays[:len(delays)/3], delays[len(delays)/3:2*len(delays)/3],delays[2*len(delays)/3:])]
+    elif (cluster== 4):
+        pass
+def file_len(fname):
+    return sum(1 for line in open(fname))
+                
 def iteratetoplot(topologyname):
-    g = [[] for n in range(10)]
-    with open('JournalGavel%sslice.txt' %topologyname) as inf:
+    print file_len('JournalGavel%sslicesavgdelay.txt' %topologyname)
+    g = [[] for n in range(file_len('JournalGavel%sslicesavgdelay.txt' %topologyname))]
+    gnew = [[] for n in range(10)]
+    slice = 0 
+    with open('JournalGavel%sslicesavgdelay.txt' %topologyname) as inf:
         for line in inf:
+            
             parts = line.split("\t") # split line into parts
-            g[int(parts[3].rstrip())].append(float (parts[2]))
+            
+            for p in parts:
+                if p == '\n':
+                    pass
+                else:
+                    g[slice].append(float (p))
+            slice = slice +1
+    print len(g)
+    for a in g:
+        print len(a)
+    
+    for n in range (10):
+        if n >1:
+            gnew[n].extend (avgofdelays(g[n],n))
+            
+    
     gavg = []
     parry = []
-    parry[0] = 0
+    parry.append( 0)
     #gforptest = np.concatenate((g[1],g[4]))
-    t, p = ttest_ind( g[8],g[0], equal_var=False)
+    #t, p = ttest_ind( g[8],g[0], equal_var=False)
     #print g[5],g[8]
     for n in range(9):
+        print len(g[n])
         t,p =  ttest_ind(g[0],g[n+1])
-        parry[n+1] = p
+        parry.append( p)
     print t,p
 
     for n in range (10):
@@ -154,14 +187,14 @@ def iteratetoplot(topologyname):
         else:
             gavg.append(sum(g[0])/float(len(g[0])))
             allavgofarrays[0].append((sum(g[0])/float(len(g[0]) )))
-    writeallavg(topologyname,gavg)
+    writeallavg(topologyname,gavg,parry)
     
 
    
-for i in range(5):
+for i in range(1):
     #os.system("python testslicing.py")
     #for t in ['Geant2012','16','32']:
-    iteratetoplot("16")
+    iteratetoplot("Geant2012")
 finalavg = []
  
 for n in range (10):

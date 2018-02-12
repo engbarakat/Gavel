@@ -60,6 +60,22 @@ def clearallinstalledpaths(session):
     session.run('''match ()-[r:PathSlice_to]-() delete r''')
     session.run('''match ()-[r:Path]-() delete r''')
         
+def writeavgdelay(arrayofarray,sizeoffattree):
+    fo = open("JournalGavel%sslicesavgdelay.txt" %sizeoffattree, "wb")
+    counta = 0
+    countb = 0
+    print len(arrayofarray)
+    for a in arrayofarray:
+        print len(a)
+        for n in a:
+            counta = counta+1
+            fo.write(str(n)+'\t')
+        countb = countb +1
+        fo.write("\n")
+    fo.close()
+    print counta, countb
+def addingtwoarrays(first,second):
+    return [x + y for x, y in zip(first, second)]
 
 def loadftgdb(sizeoffattree):
     print ">>>>>>>neo4j-shell -file new_gdb%s.cypher -host localhost -v" %sizeoffattree
@@ -90,13 +106,15 @@ def runthetest(topologyname,itera,listofpath):
     print ("Total Switches fetched are {0}").format(len(allswitches))
     print "Now we are running in slice No. 0 \n"
     hostlistready = {}
-    hostsnumberpossiblezeroslice = [n for n in xrange(2, len(allhosts), 2)]
+    hostsnumberpossiblezeroslice = [n for n in xrange(20, len(allhosts), 2)]
     
     for h in random.sample(allhosts, random.sample(hostsnumberpossiblezeroslice, 1)[0]):
         hoststoroute.append(h)
     print "For slice No. {0} the route test done between {1} hosts".format("0", len(hoststoroute))  
     for n in xrange(0, len(hoststoroute), 2):
         hostlistready[hoststoroute[n]] = hoststoroute[n + 1]
+        
+    listofhostpairs = []
  
     for key, v in hostlistready.iteritems():
         astartt = timeit.default_timer() * 1000
@@ -106,6 +124,7 @@ def runthetest(topologyname,itera,listofpath):
             switchesinslice.extend(result)
             avgroutinglistperslice.append(aendt - astartt)
             path = Path(key, v, aendt - astartt, 0)
+            listofhostpairs.append((key,v))
             listofpath.append(path)
 #     if len(avgroutinglistperslice) > 0:
 #         avgroutingdict[0] = sum(avgroutinglistperslice) / float(len(avgroutinglistperslice))
@@ -115,15 +134,19 @@ def runthetest(topologyname,itera,listofpath):
 #     listofzerocounted.append(zeroinlist.copy())
 #     #print len(avgroutinglistperslice)
 #     del avgroutinglistperslice[:]
+     
+    listofdelayforeveryslicetoeachhost = [[] for n in range(len(hostlistready))]
     
     for slicesize in range(1,10,1):
         clearallinstalledpaths(session)
         #delete all existing slices
         #deleteallslices(session)
         listofslices.append( createslicemodified(session, slicesize,hoststoroute,allswitches))
+        
             
         for slice in listofslices:
             hostlistinslice =  gethostsfromslice(slice)#hostlist should be ready for routing function process
+           # print hostlistinslice
                 #print "Testing routing with   {0} slices  between {1} hosts".format(slicesize, len(slice.hosts))
             for h1,h2 in hostlistinslice.iteritems():
                     
@@ -133,9 +156,12 @@ def runthetest(topologyname,itera,listofpath):
                 if (result!= False):
                     path = Path(h1,h2,endtime-starttime,slicesize)
                     #avgroutinglistperslice.append(endtime-starttime)#how to append to multidimention array
+                    listofdelayforeveryslicetoeachhost[listofhostpairs.index((h1,h2))].append(endtime-starttime)
                     listofpath.append(path)
+                    
                 else:
                     print "failing path at slice size {}".format(slice.name)
+    writeavgdelay(listofdelayforeveryslicetoeachhost,topologyname)
 
 
 def writeresults(sizeoffattree,listofpath):    
@@ -151,7 +177,7 @@ listofpadth=[]
 #NFtwo = NetworkFunction(200,[('0000000000001b01',11),('0000000000001901',9),('0000000000002601',6)])
 #NFthree = NetworkFunction(300,[('0000000000000e01',12),('0000000000001601',6),('0000000000001001',10)])
  
-for s in ['16']:
+for s in ['Geant2012']:
     listofpath=[]
     loadftgdb(s)
     for i in range(1):
