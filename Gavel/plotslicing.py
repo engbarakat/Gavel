@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.patches import Polygon
 from pylab import plot, show, savefig, xlim, figure, hold, ylim, legend, boxplot, setp, axes
-from neo4j.v1.result import BoltStatementResultSummary
+#from neo4j.v1.result import BoltStatementResultSummary
 from scipy.stats import ttest_ind, ttest_ind_from_stats
 from scipy.special import stdtr
 import os
@@ -121,11 +121,8 @@ fixed
 
 
 
-def writeallavg(topologyname,gavg,parry):
+def writeallavg(topologyname,parry):
     with open('allavgJournalGavel%sslice.txt' %topologyname, "wb") as myfile:
-        for n in gavg:
-            myfile.write(str (n) + ' ')
-        myfile.write('\n')
         for n in parry:
             myfile.write(str (n) + ' ')
         myfile.write('\n')
@@ -148,6 +145,17 @@ def iteratetoplot(topologyname):
     g = [[] for n in range(file_len('JournalGavel%sslicesavgdelay.txt' %topologyname))]
     avgready = [[] for n in range(file_len('JournalGavel%sslicesavgdelay.txt' %topologyname))]
     gslicezero = []
+    gsliceone = []
+    listofsliceswithvalues= [[] for n in range(10)]
+    with open('JournalGavel%sslice.txt' %topologyname) as inf:
+        for line in inf:
+            parts = line.split("\t") # split line into parts
+            if int(parts[3].rstrip()) == 0 :
+                gslicezero.append(float (parts[2]))
+            if int(parts[3].rstrip()) == 1 :
+                gsliceone.append(float (parts[2]))
+    listofsliceswithvalues.append(gslicezero)
+    listofsliceswithvalues.append(gsliceone)#adding slice 1 resutls without changes
     slice = 0 
     with open('JournalGavel%sslicesavgdelay.txt' %topologyname) as inf:
         for line in inf:
@@ -162,38 +170,19 @@ def iteratetoplot(topologyname):
     arrayofreadyavg = []
     for hostpairs in g:
         index = 1
-        listofavg = []
+        slicevalues = []
         for avgvalue in hostpairs:
-            listofavg.append(numpy.mean(avgvalue[:index]))
+            slicevalues.append(numpy.mean(avgvalue[:index]))
             index = index + 1
-        arrayofreadyavg.append(listofavg)
+        listofsliceswithvalues.append(slicevalues)
     pvaluearray = []
     ## now arrange all arays to contain all values correctly you need 10 arrays.
-    t,p =  ttest_ind(gslicezero[0],g[0])
-    pvaluearray.append( p)
-    for n in range len()
-            
+    for n in xrange(1, len(gslicezero),1):
+        t,p =  ttest_ind(listofsliceswithvalues[0],listofsliceswithvalues[n])
+        pvaluearray.append( p)
     
-    gavg = []
-    parry = []
-    parry.append( 0)
-    #gforptest = np.concatenate((g[1],g[4]))
-    #t, p = ttest_ind( g[8],g[0], equal_var=False)
-    #print g[5],g[8]
-    for n in range(9):
-        print len(g[n])
-        t,p =  ttest_ind(g[0],g[n+1])
-        parry.append( p)
-    print t,p
-
-    for n in range (10):
-        if n > 0:
-            gavg.append( (sum(g[n])/float(len(g[n]) )))#-( sum(g[0])/float(len(g[0])) ))
-            allavgofarrays[n].append((sum(g[n])/float(len(g[n]) )))
-        else:
-            gavg.append(sum(g[0])/float(len(g[0])))
-            allavgofarrays[0].append((sum(g[0])/float(len(g[0]) )))
-    writeallavg(topologyname,gavg,parry)
+            
+    writeallavg(topologyname,pvaluearray)
     
 
    
