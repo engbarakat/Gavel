@@ -156,6 +156,9 @@ def iteratetoplot(topologyname):
                 gsliceone.append(float (parts[2]))
     listofsliceswithvalues.append(gslicezero)
     listofsliceswithvalues.append(gsliceone)#adding slice 1 resutls without changes
+    print gsliceone, gslicezero
+    print "again print list of slices with values"
+    print listofsliceswithvalues
     slice = 0 
     with open('JournalGavel%sslicesavgdelay.txt' %topologyname) as inf:
         for line in inf:
@@ -167,17 +170,19 @@ def iteratetoplot(topologyname):
                 else:
                     g[slice].append(float (p))
             slice = slice +1
-    arrayofreadyavg = []
+    
     for hostpairs in g:
         index = 1
         slicevalues = []
-        for avgvalue in hostpairs:
-            slicevalues.append(numpy.mean(avgvalue[:index]))
-            index = index + 1
+        slicevalues.append(np.mean(hostpairs[:index]))
+        print"print slices valuse"
+        print slicevalues
+        index = index + 1
         listofsliceswithvalues.append(slicevalues)
     pvaluearray = []
     ## now arrange all arays to contain all values correctly you need 10 arrays.
     for n in xrange(1, len(gslicezero),1):
+        print listofsliceswithvalues[0],listofsliceswithvalues[n]
         t,p =  ttest_ind(listofsliceswithvalues[0],listofsliceswithvalues[n])
         pvaluearray.append( p)
     
@@ -190,26 +195,19 @@ for i in range(1):
     #os.system("python testslicing.py")
     #for t in ['Geant2012','16','32']:
     iteratetoplot("Geant2012")
-finalavg = []
- 
-for n in range (10):
-    if n > 0:
-        finalavg.append( (sum(allavgofarrays[n])/float(len(allavgofarrays[n]) )))#-( sum(allavgofarrays[0])/float(len(allavgofarrays[0])) ))
-    else:
-        finalavg.append(sum(allavgofarrays[0])/float(len(allavgofarrays[0])))
 
 
-index = np.arange(10)
-plt.bar(index, finalavg, 0.5,
-                 alpha=0.4,
-                 color='g')
-
-plt.xlabel('No. of Slices')
-plt.ylabel('Time (ms)')
-plt.title('Geant2012')
-plt.xticks(index  , ('0', '1', '2', '3', '4','5', '6', '7','8','9'))
-plt.legend()
-
-plt.tight_layout()
-plt.show()
+# index = np.arange(10)
+# plt.bar(index, finalavg, 0.5,
+#                  alpha=0.4,
+#                  color='g')
+# 
+# plt.xlabel('No. of Slices')
+# plt.ylabel('Time (ms)')
+# plt.title('Geant2012')
+# plt.xticks(index  , ('0', '1', '2', '3', '4','5', '6', '7','8','9'))
+# plt.legend()
+# 
+# #plt.tight_layout()
+# #plt.show()
 
