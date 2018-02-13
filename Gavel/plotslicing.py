@@ -154,11 +154,10 @@ def iteratetoplot(topologyname):
                 gslicezero.append(float (parts[2]))
             if int(parts[3].rstrip()) == 1 :
                 gsliceone.append(float (parts[2]))
-    listofsliceswithvalues.append(gslicezero)
-    listofsliceswithvalues.append(gsliceone)#adding slice 1 resutls without changes
-    print gsliceone, gslicezero
-    print "again print list of slices with values"
-    print listofsliceswithvalues
+    listofsliceswithvalues[0] = gslicezero
+    listofsliceswithvalues[1] =gsliceone#adding slice 1 resutls without change
+    #print gslicezero,gsliceone
+
     slice = 0 
     with open('JournalGavel%sslicesavgdelay.txt' %topologyname) as inf:
         for line in inf:
@@ -168,21 +167,25 @@ def iteratetoplot(topologyname):
                 if p == '\n':
                     pass
                 else:
+                    print slice, p
                     g[slice].append(float (p))
             slice = slice +1
-    
-    for hostpairs in g:
-        index = 1
+    print len(g)
+    for index in xrange(1,9):
+        #print index
         slicevalues = []
-        slicevalues.append(np.mean(hostpairs[:index]))
-        print"print slices valuse"
-        print slicevalues
-        index = index + 1
-        listofsliceswithvalues.append(slicevalues)
+        for hostpairs in g:
+            slicevalues.append(np.mean(hostpairs[:index]))
+            
+        #print slicevalues
+        listofsliceswithvalues[index+1] = (slicevalues)
     pvaluearray = []
     ## now arrange all arays to contain all values correctly you need 10 arrays.
-    for n in xrange(1, len(gslicezero),1):
-        print listofsliceswithvalues[0],listofsliceswithvalues[n]
+    for n in xrange(1, 10,1):
+        #print n
+        print len(listofsliceswithvalues[0]),len(listofsliceswithvalues[n])
+        if n == 9:
+            print listofsliceswithvalues[0],'\n',listofsliceswithvalues[n]
         t,p =  ttest_ind(listofsliceswithvalues[0],listofsliceswithvalues[n])
         pvaluearray.append( p)
     
