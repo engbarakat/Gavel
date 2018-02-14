@@ -214,7 +214,7 @@ def iteratetoplot(topologyname):
 for i in range(1):
     #os.system("python testslicing.py")
     #for t in ['Geant2012','16','32']:
-    iteratetoplot("32")
+    iteratetoplot("Geant2012")
 
 
 # index = np.arange(10)
