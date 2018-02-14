@@ -3,7 +3,7 @@ import numpy as np
 from matplotlib.patches import Polygon
 from pylab import plot, show, savefig, xlim, figure, hold, ylim, legend, boxplot, setp, axes
 #from neo4j.v1.result import BoltStatementResultSummary
-from scipy.stats import ttest_ind, ttest_ind_from_stats
+from scipy.stats import ttest_ind, ttest_ind_from_stats,mannwhitneyu
 from scipy.special import stdtr
 import os
 #plt.rcParams.update({'font.size': 40, 'legend.fontsize': 30,'font.color': '#77933C', 'xtick.major.pad':25, 'legend.linewidth': 2})
@@ -127,7 +127,15 @@ def writeallavg(topologyname,parry):
             myfile.write(str (n) + ' ')
         myfile.write('\n')
 
+def writeall(sizeoffattree,arrayofarray):
+    fo = open("JournalGavel%sslicesavgofavgtocorrectpvalue.txt" %sizeoffattree, "wb")
+    for a in arrayofarray:
+        for n in a:
 
+            fo.write(str(n)+'\t')
+
+        fo.write("\n")
+    fo.close()
 
 def avgofdelays(delays, cluster):
     if (cluster == 2):
@@ -167,37 +175,46 @@ def iteratetoplot(topologyname):
                 if p == '\n':
                     pass
                 else:
-                    print slice, p
+                    #print slice, p
                     g[slice].append(float (p))
             slice = slice +1
-    print len(g)
+    #print len(g)
+    oldindex = 1
     for index in xrange(1,9):
+        
         #print index
         slicevalues = []
         for hostpairs in g:
-            slicevalues.append(np.mean(hostpairs[:index]))
+            #print len(hostpairs)
+            #print oldindex,oldindex+index
+            slicevalues.append(np.mean(hostpairs[oldindex:oldindex+index]))
             
         #print slicevalues
         listofsliceswithvalues[index+1] = (slicevalues)
+        #print oldindex,oldindex+index
+        oldindex = oldindex+index+1
     pvaluearray = []
     ## now arrange all arays to contain all values correctly you need 10 arrays.
     for n in xrange(1, 10,1):
         #print n
-        print len(listofsliceswithvalues[0]),len(listofsliceswithvalues[n])
-        if n == 9:
-            print listofsliceswithvalues[0],'\n',listofsliceswithvalues[n]
-        t,p =  ttest_ind(listofsliceswithvalues[0],listofsliceswithvalues[n])
+        #print len(listofsliceswithvalues[0]),len(listofsliceswithvalues[n])
+        #if n == 9:
+            #print listofsliceswithvalues[0],'\n',listofsliceswithvalues[n]
+        t,p =  mannwhitneyu(listofsliceswithvalues[0],listofsliceswithvalues[n],alternative="less")
         pvaluearray.append( p)
+        print "t = " , t," p = " , p,"\n"
+
     
             
     writeallavg(topologyname,pvaluearray)
+    writeall(topologyname,listofsliceswithvalues)
     
 
    
 for i in range(1):
     #os.system("python testslicing.py")
     #for t in ['Geant2012','16','32']:
-    iteratetoplot("Geant2012")
+    iteratetoplot("32")
 
 
 # index = np.arange(10)

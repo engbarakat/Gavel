@@ -64,16 +64,15 @@ def writeavgdelay(arrayofarray,sizeoffattree):
     fo = open("JournalGavel%sslicesavgdelay.txt" %sizeoffattree, "wb")
     counta = 0
     countb = 0
-    print len(arrayofarray)
     for a in arrayofarray:
-        print len(a)
+
         for n in a:
             counta = counta+1
             fo.write(str(n)+'\t')
         countb = countb +1
         fo.write("\n")
     fo.close()
-    print counta, countb
+
 def addingtwoarrays(first,second):
     return [x + y for x, y in zip(first, second)]
 
@@ -149,7 +148,7 @@ def runthetest(topologyname,itera,listofpath):
            # print hostlistinslice
                 #print "Testing routing with   {0} slices  between {1} hosts".format(slicesize, len(slice.hosts))
             for h1,h2 in hostlistinslice.iteritems():
-                    
+                print listofhostpairs.index((h1,h2))    
                 starttime = timeit.default_timer()*1000
                 result = getroute(h1, h2, session)
                 endtime = timeit.default_timer()*1000
