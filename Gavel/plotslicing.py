@@ -214,7 +214,7 @@ for i in range(1):
     #os.system("python testslicing.py")
     #for t in ['Geant2012','16','32']:
     listofsliceswithvalues= [[] for n in range(10)]
-    iteratetoplot("32",listofsliceswithvalues)
+    iteratetoplot("16",listofsliceswithvalues)
 
 
 # index = np.arange(10)
@@ -236,8 +236,8 @@ for n in range(10):
     nooutlierdata[n] = listofsliceswithvalues[n][~is_outlier(listofsliceswithvalues[n])]
     
 plt.figure()
-#plt.ylim((0,150))
+plt.ylim((0,150))
 
-plt.boxplot(nooutlierdata)
+plt.boxplot(listofsliceswithvalues)
 
 plt.show()
