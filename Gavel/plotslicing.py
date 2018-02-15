@@ -148,13 +148,12 @@ def avgofdelays(delays, cluster):
 def file_len(fname):
     return sum(1 for line in open(fname))
                 
-def iteratetoplot(topologyname):
+def iteratetoplot(topologyname,listofsliceswithvalues):
     print file_len('JournalGavel%sslicesavgdelay.txt' %topologyname)
     g = [[] for n in range(file_len('JournalGavel%sslicesavgdelay.txt' %topologyname))]
     avgready = [[] for n in range(file_len('JournalGavel%sslicesavgdelay.txt' %topologyname))]
     gslicezero = []
     gsliceone = []
-    listofsliceswithvalues= [[] for n in range(10)]
     with open('JournalGavel%sslice.txt' %topologyname) as inf:
         for line in inf:
             parts = line.split("\t") # split line into parts
@@ -206,15 +205,16 @@ def iteratetoplot(topologyname):
 
     
             
-    writeallavg(topologyname,pvaluearray)
-    writeall(topologyname,listofsliceswithvalues)
+    #writeallavg(topologyname,pvaluearray)
+    #writeall(topologyname,listofsliceswithvalues)
     
 
    
 for i in range(1):
     #os.system("python testslicing.py")
     #for t in ['Geant2012','16','32']:
-    iteratetoplot("Geant2012")
+    listofsliceswithvalues= [[] for n in range(10)]
+    iteratetoplot("32",listofsliceswithvalues)
 
 
 # index = np.arange(10)
@@ -230,4 +230,14 @@ for i in range(1):
 # 
 # #plt.tight_layout()
 # #plt.show()
+nooutlierdata =[[] for n in range(10)]
+for n in range(10):
+    listofsliceswithvalues[n] = np.array(listofsliceswithvalues[n])
+    nooutlierdata[n] = listofsliceswithvalues[n][~is_outlier(listofsliceswithvalues[n])]
+    
+plt.figure()
+#plt.ylim((0,150))
 
+plt.boxplot(nooutlierdata)
+
+plt.show()
