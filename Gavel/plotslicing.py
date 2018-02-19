@@ -234,10 +234,12 @@ nooutlierdata =[[] for n in range(10)]
 for n in range(10):
     listofsliceswithvalues[n] = np.array(listofsliceswithvalues[n])
     nooutlierdata[n] = listofsliceswithvalues[n][~is_outlier(listofsliceswithvalues[n])]
-    
-plt.figure()
-plt.ylim((0,150))
 
-plt.boxplot(listofsliceswithvalues)
+ 
+#plt.figure()
+plt.ylim((0,90))
+
+plt.boxplot(nooutlierdata)
+plt.xticks(np.arange(11), ('','0', '1', '2', '3', '4','5', '6', '7','8','9'))
 
 plt.show()
