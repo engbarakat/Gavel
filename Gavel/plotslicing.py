@@ -8,8 +8,9 @@ from scipy.special import stdtr
 import os
 #plt.rcParams.update({'font.size': 40, 'legend.fontsize': 30,'font.color': '#77933C', 'xtick.major.pad':25, 'legend.linewidth': 2})
 
-
-
+plt.rc('xtick', labelsize=22)    # fontsize of the tick labels
+plt.rc('ytick', labelsize=22)
+plt.rc('figure',titlesize = 30)
 g3 = []
 g4=[]
 g5=[]
@@ -201,7 +202,7 @@ def iteratetoplot(topologyname,listofsliceswithvalues):
             #print listofsliceswithvalues[0],'\n',listofsliceswithvalues[n]
         t,p =  mannwhitneyu(listofsliceswithvalues[0],listofsliceswithvalues[n],alternative="less")
         pvaluearray.append( p)
-        print "t = " , t," p = " , p,"\n"
+        #print "t = " , t," p = " , p,"\n"
 
     
             
@@ -214,7 +215,7 @@ for i in range(1):
     #os.system("python testslicing.py")
     #for t in ['Geant2012','16','32']:
     listofsliceswithvalues= [[] for n in range(10)]
-    iteratetoplot("16",listofsliceswithvalues)
+    iteratetoplot("Geant2012",listofsliceswithvalues)
 
 
 # index = np.arange(10)
@@ -237,8 +238,10 @@ for n in range(10):
 
  
 #plt.figure()
-plt.ylim((0,90))
-
+#plt.ylim((60,90))
+plt.ylabel("Time(ms)",size = 30)
+plt.xlabel("No. of Slices",size = 30)
+plt.title("Geant2012",size = 30)
 plt.boxplot(nooutlierdata)
 plt.xticks(np.arange(11), ('','0', '1', '2', '3', '4','5', '6', '7','8','9'))
 
