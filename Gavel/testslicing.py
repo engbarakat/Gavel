@@ -51,9 +51,14 @@ def deleteallslices(session):
     session.run('''match (n:Slice) detach delete n''')
 
 def gethostsfromslice(slice):
-    hostsinslice = {}
+    hostsinslice = []
     for n in xrange(0,len(slice.hosts), 2):
-        hostsinslice[slice.hosts[n]] = slice.hosts[n+1]
+        hostsinslice.append((slice.hosts[n],slice.hosts[n+1]))
+    if len(hostsinslice<25):
+        for n in xrange(0, len(slice.hosts), 1):
+            if n<(len(hoststoroute)-4):
+                hostsinslice.append((slice.hosts[n],slice.hosts[n + 2]))
+                hostsinslice.append((slice.hosts[n],slice.hosts[n + 3]))
     return hostsinslice
 
 def clearallinstalledpaths(session):
@@ -104,26 +109,44 @@ def runthetest(topologyname,itera,listofpath):
         allswitches.append(host["dpid"])
     print ("Total Switches fetched are {0}").format(len(allswitches))
     print "Now we are running in slice No. 0 \n"
-    hostlistready = {}
+    hostlistready = ()
     hostsnumberpossiblezeroslice = [n for n in xrange(20, len(allhosts), 2)]
     
     for h in random.sample(allhosts, random.sample(hostsnumberpossiblezeroslice, 1)[0]):
         hoststoroute.append(h)
     print "For slice No. {0} the route test done between {1} hosts".format("0", len(hoststoroute))  
     for n in xrange(0, len(hoststoroute), 2):
-        hostlistready[hoststoroute[n]] = hoststoroute[n + 1]
-        
+        #hostlistready[hoststoroute[n]] = hoststoroute[n + 1]
+        hostlistready.append((hoststoroute[n],hoststoroute[n + 1]))
+    if len(hostlistready<25):
+        for n in xrange(0, len(hoststoroute), 1):
+            if n<(len(hoststoroute)-4):
+                hostlistready.append((hoststoroute[n],hoststoroute[n + 2]))
+                hostlistready.append((hoststoroute[n],hoststoroute[n + 3]))
+
+            
+    
     listofhostpairs = []
  
-    for key, v in hostlistready.iteritems():
+#     for key, v in hostlistready.iteritems():
+#         astartt = timeit.default_timer() * 1000
+#         result = getroute(key, v, session)
+#         if (result!= False):
+#             aendt = timeit.default_timer() * 1000
+#             switchesinslice.extend(result)
+#             avgroutinglistperslice.append(aendt - astartt)
+#             path = Path(key, v, aendt - astartt, 0)
+#             listofhostpairs.append((key,v))
+#             listofpath.append(path)
+    for pair in hostlistready:
         astartt = timeit.default_timer() * 1000
-        result = getroute(key, v, session)
+        result = getroute(pair[0], pair[1], session)
         if (result!= False):
             aendt = timeit.default_timer() * 1000
             switchesinslice.extend(result)
             avgroutinglistperslice.append(aendt - astartt)
-            path = Path(key, v, aendt - astartt, 0)
-            listofhostpairs.append((key,v))
+            path = Path(pair[0],pair[1], aendt - astartt, 0)
+            listofhostpairs.append(pair)
             listofpath.append(path)
 #     if len(avgroutinglistperslice) > 0:
 #         avgroutingdict[0] = sum(avgroutinglistperslice) / float(len(avgroutinglistperslice))
@@ -147,15 +170,15 @@ def runthetest(topologyname,itera,listofpath):
             hostlistinslice =  gethostsfromslice(slice)#hostlist should be ready for routing function process
            # print hostlistinslice
                 #print "Testing routing with   {0} slices  between {1} hosts".format(slicesize, len(slice.hosts))
-            for h1,h2 in hostlistinslice.iteritems():
-                print listofhostpairs.index((h1,h2))    
+            for pair in hostlistinslice:
+                #print listofhostpairs.index(pair)    
                 starttime = timeit.default_timer()*1000
-                result = getroute(h1, h2, session)
+                result = getroute(pair[0], pair[1], session)
                 endtime = timeit.default_timer()*1000
                 if (result!= False):
-                    path = Path(h1,h2,endtime-starttime,slicesize)
+                    path = Path(pair[0], pair[1],endtime-starttime,slicesize)
                     #avgroutinglistperslice.append(endtime-starttime)#how to append to multidimention array
-                    listofdelayforeveryslicetoeachhost[listofhostpairs.index((h1,h2))].append(endtime-starttime)
+                    listofdelayforeveryslicetoeachhost[listofhostpairs.index(pair)].append(endtime-starttime)
                     listofpath.append(path)
                     
                 else:
