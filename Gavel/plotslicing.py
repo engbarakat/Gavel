@@ -215,7 +215,7 @@ for i in range(1):
     #os.system("python testslicing.py")
     #for t in ['Geant2012','16','32']:
     listofsliceswithvalues= [[] for n in range(10)]
-    iteratetoplot("Geant2012",listofsliceswithvalues)
+    iteratetoplot("64",listofsliceswithvalues)
 
 
 # index = np.arange(10)
@@ -238,10 +238,10 @@ for n in range(10):
 
  
 #plt.figure()
-#plt.ylim((60,90))
+plt.ylim((60,90))
 plt.ylabel("Time(ms)",size = 30)
 plt.xlabel("No. of Slices",size = 30)
-plt.title("Geant2012",size = 30)
+plt.title("FatTree 64",size = 30)
 plt.boxplot(nooutlierdata)
 plt.xticks(np.arange(11), ('','0', '1', '2', '3', '4','5', '6', '7','8','9'))
 

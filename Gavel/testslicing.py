@@ -54,9 +54,9 @@ def gethostsfromslice(slice):
     hostsinslice = []
     for n in xrange(0,len(slice.hosts), 2):
         hostsinslice.append((slice.hosts[n],slice.hosts[n+1]))
-    if len(hostsinslice<25):
+    if len(hostsinslice)<25:
         for n in xrange(0, len(slice.hosts), 1):
-            if n<(len(hoststoroute)-4):
+            if n<(len(slice.hosts)-4):
                 hostsinslice.append((slice.hosts[n],slice.hosts[n + 2]))
                 hostsinslice.append((slice.hosts[n],slice.hosts[n + 3]))
     return hostsinslice
@@ -109,7 +109,7 @@ def runthetest(topologyname,itera,listofpath):
         allswitches.append(host["dpid"])
     print ("Total Switches fetched are {0}").format(len(allswitches))
     print "Now we are running in slice No. 0 \n"
-    hostlistready = ()
+    hostlistready = []
     hostsnumberpossiblezeroslice = [n for n in xrange(20, len(allhosts), 2)]
     
     for h in random.sample(allhosts, random.sample(hostsnumberpossiblezeroslice, 1)[0]):
@@ -118,7 +118,7 @@ def runthetest(topologyname,itera,listofpath):
     for n in xrange(0, len(hoststoroute), 2):
         #hostlistready[hoststoroute[n]] = hoststoroute[n + 1]
         hostlistready.append((hoststoroute[n],hoststoroute[n + 1]))
-    if len(hostlistready<25):
+    if len(hostlistready)<25:
         for n in xrange(0, len(hoststoroute), 1):
             if n<(len(hoststoroute)-4):
                 hostlistready.append((hoststoroute[n],hoststoroute[n + 2]))
@@ -199,7 +199,7 @@ listofpadth=[]
 #NFtwo = NetworkFunction(200,[('0000000000001b01',11),('0000000000001901',9),('0000000000002601',6)])
 #NFthree = NetworkFunction(300,[('0000000000000e01',12),('0000000000001601',6),('0000000000001001',10)])
  
-for s in ['Geant2012']:
+for s in ['64']:
     listofpath=[]
     loadftgdb(s)
     for i in range(1):
