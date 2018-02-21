@@ -8,9 +8,9 @@ from scipy.special import stdtr
 import os
 #plt.rcParams.update({'font.size': 40, 'legend.fontsize': 30,'font.color': '#77933C', 'xtick.major.pad':25, 'legend.linewidth': 2})
 
-plt.rc('xtick', labelsize=22)    # fontsize of the tick labels
-plt.rc('ytick', labelsize=22)
-plt.rc('figure',titlesize = 30)
+plt.rc('xtick', labelsize=50)    # fontsize of the tick labels
+plt.rc('ytick', labelsize=50)
+plt.rc('figure',titlesize = 50)
 g3 = []
 g4=[]
 g5=[]
@@ -215,7 +215,7 @@ for i in range(1):
     #os.system("python testslicing.py")
     #for t in ['Geant2012','16','32']:
     listofsliceswithvalues= [[] for n in range(10)]
-    iteratetoplot("64",listofsliceswithvalues)
+    iteratetoplot("16",listofsliceswithvalues)
 
 
 # index = np.arange(10)
@@ -239,9 +239,9 @@ for n in range(10):
  
 #plt.figure()
 plt.ylim((60,90))
-plt.ylabel("Time(ms)",size = 30)
-plt.xlabel("No. of Slices",size = 30)
-plt.title("FatTree 64",size = 30)
+plt.ylabel("Time(ms)",size = 50)
+plt.xlabel("No. of Slices",size = 50)
+plt.title("FatTree 16",size = 50)
 plt.boxplot(nooutlierdata)
 plt.xticks(np.arange(11), ('','0', '1', '2', '3', '4','5', '6', '7','8','9'))
 
