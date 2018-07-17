@@ -21,7 +21,10 @@ MERGE (h)-[pu:Connected_to]->(s)
 ON CREATE SET pu.port1 = toInt(row.port1), pu.port2 = toInt(row.port2), pu.node2 = h.ip, pu.node1=s.dpid, pu.cost = toInt(row.port1)
 MERGE (s)-[up:Connected_to]->(h)
 ON CREATE SET up.port2 = toInt(row.port1), up.port1 = toInt(row.port2), up.node1 = h.ip, up.node2=s.dpid,up.cost = toInt(row.port2);
+<<<<<<< HEAD
 
+=======
+>>>>>>> GavelMBs
 USING PERIODIC COMMIT 10000
 LOAD CSV WITH HEADERS FROM "file:///TestedTopologies/switched_to32.csv" AS row
 MATCH (s2:Switch {id: row.node2})

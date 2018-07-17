@@ -28,5 +28,31 @@ numberOfKids
     b. end node is Hostend
     c. all functions need to be associated with some nodes(relationships) //size(filter(x in nodes(path) WHERE (x:Kid))) >= numberOfKids
     d. every path matches above are saved to validpaths list
+<<<<<<< HEAD
     
 3. 
+=======
+   
+3.Exempt all path that appears to go through functions more than once.
+
+4. Exempt paths that Functions appear in different order (OPT)
+
+5. exempt all paths that doesnt go through all required functions. review line No. 8
+
+6. Later could be extented to implement BW constrains or delay constrains (OPT)
+
+Match (function:MB) where MB.dpid in {values} return MBsSet
+Match path = (startnode)->(endnode) return path as pathsetraw
+with pathsetraw, MBsSet
+-- for every switch in the path get all functions connected to it, return distinct set of all functions supported by the path. (write function that take path and return supported functions)
+
+
+************************New algorithm
+
+Build the routing solution
+
+for every Function in the list:
+
+1. find the shortest path for every node hosts this function
+2. build a decision tree then find the route to the end. 
+>>>>>>> GavelMBs
