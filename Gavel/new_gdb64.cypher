@@ -1,8 +1,3 @@
-match ()-[n:PathSlice_to]-() detach delete n;
-match (:Host)-[n:Connected_to]-(:Switch) delete n;
-match (n: Host) detach delete n;
-match (n: Switch) detach delete n;
-
 Match (n) detach delete n;
 
 USING PERIODIC COMMIT 10000
